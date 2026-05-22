@@ -1,0 +1,10 @@
+# Lingkungan Virtual Python
+env/
+venv/
+
+# File Cache Python
+__pycache__/
+*.pyc
+
+# Folder Upload Gambar Lokal
+backend/uploads/

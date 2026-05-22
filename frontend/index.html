@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <title>Dashboard | Sistem Pertanian Terpadu</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+  <link rel="icon" href="assets/images/favicon.svg" type="image/x-icon"> 
+  <link rel="stylesheet" href="assets/fonts/inter/inter.css" id="main-font-link" />
+  <link rel="stylesheet" href="assets/fonts/tabler-icons.min.css" >
+  <link rel="stylesheet" href="assets/fonts/feather.css" >
+  <link rel="stylesheet" href="assets/fonts/fontawesome.css" >
+  <link rel="stylesheet" href="assets/fonts/material.css" >
+  <link rel="stylesheet" href="assets/css/style.css" id="main-style-link" >
+  <link rel="stylesheet" href="assets/css/style-preset.css" >
+</head>
+<body data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-layout="vertical" data-pc-direction="ltr" data-pc-theme="light">
+  
+<div class="loader-bg"><div class="loader-track"><div class="loader-fill"></div></div></div>
+
+<nav class="pc-sidebar">
+  <div class="navbar-wrapper">
+    <div class="m-header">
+      <a href="index.html" class="b-brand text-primary">
+        <h4 class="mb-0 text-primary"><i class="ti ti-leaf"></i> AgriDSS</h4>
+      </a>
+    </div>
+    <div class="navbar-content">
+      <div class="card pc-user-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0"><img src="assets/images/user/avatar-1.jpg" alt="user" class="user-avtar wid-45 rounded-circle" /></div>
+            <div class="flex-grow-1 ms-3 me-2"><h6 class="mb-0">Petani Admin</h6><small>Administrator</small></div>
+          </div>
+        </div>
+      </div>
+      <ul class="pc-navbar">
+        <li class="pc-item pc-caption"><label>Sistem Pertanian</label></li>
+        <li class="pc-item active"><a href="index.html" class="pc-link"><span class="pc-micon"><i class="ti ti-dashboard"></i></span><span class="pc-mtext">Dashboard</span></a></li>
+        <li class="pc-item"><a href="lahan.html" class="pc-link"><span class="pc-micon"><i class="ti ti-plant-2"></i></span><span class="pc-mtext">Manajemen Lahan</span></a></li>
+        <li class="pc-item"><a href="tanah.html" class="pc-link"><span class="pc-micon"><i class="ti ti-flask"></i></span><span class="pc-mtext">Pemantauan Tanah</span></a></li>
+        <li class="pc-item"><a href="klinik.html" class="pc-link"><span class="pc-micon"><i class="ti ti-stethoscope"></i></span><span class="pc-mtext">Klinik Tanaman</span></a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header class="pc-header">
+  <div class="header-wrapper"> 
+    <div class="me-auto pc-mob-drp">
+      <ul class="list-unstyled">
+        <li class="pc-h-item pc-sidebar-collapse"><a href="#" class="pc-head-link ms-0" id="sidebar-hide"><i class="ti ti-menu-2"></i></a></li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<div class="pc-container">
+  <div class="pc-content">
+    
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-12"><div class="page-header-title"><h2 class="mb-0">Ringkasan Pertanian Hari Ini</h2></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4 col-sm-6">
+        <div class="card statistics-card-1">
+          <div class="card-body">
+            <img src="assets/images/widget/img-status-2.svg" alt="img" class="img-fluid img-bg" />
+            <div class="d-flex align-items-center">
+              <div class="avtar bg-brand-color-1 text-white me-3"><i class="ti ti-plant-2 f-24"></i></div>
+              <div>
+                <p class="text-muted mb-0">Total Lahan Aktif</p>
+                <div class="d-flex align-items-end">
+                  <h2 class="mb-0 f-w-500" id="angkaLahan">0</h2>
+                  <span class="badge bg-light-success ms-2">Bedengan</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 col-sm-6">
+        <div class="card statistics-card-1">
+          <div class="card-body">
+            <img src="assets/images/widget/img-status-1.svg" alt="img" class="img-fluid img-bg" />
+            <div class="d-flex align-items-center">
+              <div class="avtar bg-brand-color-2 text-white me-3"><i class="ti ti-droplet f-24"></i></div>
+              <div>
+                <p class="text-muted mb-0">Tugas Rawat Hari Ini</p>
+                <div class="d-flex align-items-end">
+                  <h2 class="mb-0 f-w-500" id="angkaTugas">0</h2>
+                  <span class="badge bg-light-primary ms-2">Tugas</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 col-sm-12">
+        <div class="card statistics-card-1">
+          <div class="card-body">
+            <img src="assets/images/widget/img-status-3.svg" alt="img" class="img-fluid img-bg" />
+            <div class="d-flex align-items-center">
+              <div class="avtar bg-brand-color-3 text-white me-3"><i class="ti ti-robot f-24"></i></div>
+              <div>
+                <p class="text-muted mb-0">Bot Telegram</p>
+                <div class="d-flex align-items-end">
+                  <h3 class="mb-0 f-w-500 text-success">Terkoneksi</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h5>Daftar Perawatan (Hari Ini)</h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Nama Lahan</th>
+                    <th>Jenis Tugas</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="tabelTugasHariIni">
+                  <tr><td colspan="3" class="text-center text-muted">Memuat data tugas...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="pc-footer"><div class="footer-wrapper container-fluid"><div class="row"><div class="col my-1"><p class="m-0 text-muted">Sistem Pendukung Keputusan Pertanian © 2026</p></div></div></div></footer> 
+
+<script src="assets/js/plugins/popper.min.js"></script>
+<script src="assets/js/plugins/simplebar.min.js"></script>
+<script src="assets/js/plugins/bootstrap.min.js"></script>
+<script src="assets/js/fonts/custom-font.js"></script>
+<script src="assets/js/script.js"></script>
+<script src="assets/js/theme.js"></script>
+<script src="assets/js/plugins/feather.min.js"></script>
+<script>change_box_container('false'); layout_caption_change('true'); layout_rtl_change('false'); preset_change("preset-1");</script>
+
+<script>
+  const apiBaseUrl = 'http://127.0.0.1:8000/api';
+
+  document.addEventListener("DOMContentLoaded", function() {
+      // 1. Ambil Total Lahan
+      fetch(`${apiBaseUrl}/lahan`)
+          .then(res => res.json())
+          .then(data => {
+              // Hitung lahan yang statusnya belum selesai (aktif)
+              const lahanAktif = data.filter(l => l.status_selesai === false).length;
+              document.getElementById('angkaLahan').innerText = lahanAktif;
+          })
+          .catch(err => console.error(err));
+
+      // 2. Ambil Tugas Hari Ini
+      fetch(`${apiBaseUrl}/jadwal/hari-ini`)
+          .then(res => res.json())
+          .then(data => {
+              document.getElementById('angkaTugas').innerText = data.length;
+              
+              const tbody = document.getElementById('tabelTugasHariIni');
+              tbody.innerHTML = '';
+              
+              if(data.length === 0) {
+                  tbody.innerHTML = '<tr><td colspan="3" class="text-center">Tidak ada tugas hari ini. Lahan aman!</td></tr>';
+              } else {
+                  data.forEach(tugas => {
+                      tbody.innerHTML += `
+                          <tr>
+                              <td><strong>${tugas.lahan}</strong></td>
+                              <td><i class="ti ti-droplet text-primary me-1"></i> ${tugas.tugas}</td>
+                              <td><span class="badge bg-warning">Menunggu</span></td>
+                          </tr>
+                      `;
+                  });
+              }
+          })
+          .catch(err => console.error(err));
+  });
+</script>
+</body>
+</html>

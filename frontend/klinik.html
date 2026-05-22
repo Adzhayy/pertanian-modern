@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <title>Klinik Tanaman | Sistem Pertanian Terpadu</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+  <link rel="icon" href="assets/images/favicon.svg" type="image/x-icon"> 
+  <link rel="stylesheet" href="assets/fonts/inter/inter.css" id="main-font-link" />
+  <link rel="stylesheet" href="assets/fonts/tabler-icons.min.css" >
+  <link rel="stylesheet" href="assets/fonts/feather.css" >
+  <link rel="stylesheet" href="assets/fonts/fontawesome.css" >
+  <link rel="stylesheet" href="assets/fonts/material.css" >
+  <link rel="stylesheet" href="assets/css/style.css" id="main-style-link" >
+  <link rel="stylesheet" href="assets/css/style-preset.css" >
+
+  <style>
+    .upload-area {
+      border: 2px dashed #d1d5db;
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background-color: #f9fafb;
+    }
+    .upload-area:hover { border-color: #4680ff; background-color: #f3f6ff; }
+  </style>
+</head>
+<body data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-layout="vertical" data-pc-direction="ltr" data-pc-theme="light">
+  
+<div class="loader-bg"><div class="loader-track"><div class="loader-fill"></div></div></div>
+
+<nav class="pc-sidebar">
+  <div class="navbar-wrapper">
+    <div class="m-header">
+      <a href="lahan.html" class="b-brand text-primary">
+        <h4 class="mb-0 text-primary"><i class="ti ti-leaf"></i> AgriDSS</h4>
+      </a>
+    </div>
+    <div class="navbar-content">
+      <div class="card pc-user-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0"><img src="assets/images/user/avatar-1.jpg" alt="user" class="user-avtar wid-45 rounded-circle" /></div>
+            <div class="flex-grow-1 ms-3 me-2"><h6 class="mb-0">Petani Admin</h6><small>Administrator</small></div>
+          </div>
+        </div>
+      </div>
+      <ul class="pc-navbar">
+        <li class="pc-item pc-caption"><label>Sistem Pertanian</label></li>
+        <li class="pc-item"><a href="index.html" class="pc-link"><span class="pc-micon"><i class="ti ti-dashboard"></i></span><span class="pc-mtext">Dashboard</span></a></li>
+        <li class="pc-item"><a href="lahan.html" class="pc-link"><span class="pc-micon"><i class="ti ti-plant-2"></i></span><span class="pc-mtext">Manajemen Lahan</span></a></li>
+        <li class="pc-item"><a href="tanah.html" class="pc-link"><span class="pc-micon"><i class="ti ti-flask"></i></span><span class="pc-mtext">Pemantauan Tanah</span></a></li>
+        <li class="pc-item"><a href="klinik.html" class="pc-link"><span class="pc-micon"><i class="ti ti-stethoscope"></i></span><span class="pc-mtext">Klinik Tanaman</span></a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header class="pc-header">
+  <div class="header-wrapper"> 
+    <div class="me-auto pc-mob-drp">
+      <ul class="list-unstyled">
+        <li class="pc-h-item pc-sidebar-collapse"><a href="#" class="pc-head-link ms-0" id="sidebar-hide"><i class="ti ti-menu-2"></i></a></li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<div class="pc-container">
+  <div class="pc-content">
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-12"><div class="page-header-title"><h2 class="mb-0">Diagnosis Penyakit Daun (AI)</h2></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-5 col-xl-4">
+        <div class="card">
+          <div class="card-header"><h5>Unggah Foto Daun</h5></div>
+          <div class="card-body">
+            <form id="formKlinik">
+              <div class="mb-3">
+                <label class="form-label">Pilih Jenis Tanaman</label>
+                <select class="form-select" id="jenisTanaman">
+                  <option selected disabled value="">-- Pilih Tanaman --</option>
+                  <option value="tomat">Tomat</option>
+                  <option value="cabai">Cabai</option>
+                  <option value="sawi">Sawi</option>
+                </select>
+              </div>
+              
+              <div class="mb-4">
+                <div class="upload-area" onclick="document.getElementById('fileUpload').click()">
+                  <i class="ti ti-cloud-upload text-primary" style="font-size: 3rem;"></i>
+                  <h6 class="mt-3 mb-1">Klik untuk memilih gambar</h6>
+                  <p class="text-muted text-sm mb-0">Format JPG, PNG, atau JPEG</p>
+                  <input type="file" id="fileUpload" class="d-none" accept="image/jpeg, image/png, image/jpg">
+                </div>
+              </div>
+
+              <div class="alert alert-primary py-2 d-none" role="alert" id="fileInfo">
+                <i class="ti ti-file-text me-2"></i> <span id="fileName"></span>
+              </div>
+
+              <button type="button" class="btn btn-primary w-100 mt-2" id="btnDiagnosis">
+                <i class="ti ti-scan me-2"></i>Mulai Diagnosis
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-7 col-xl-8">
+        <div class="card h-100">
+          <div class="card-header"><h5>Hasil Diagnosis Sistem</h5></div>
+          <div class="card-body position-relative">
+            
+            <div id="pesanAwal" class="text-center text-muted py-5 mt-4">
+              <i class="ti ti-scan text-opacity-50" style="font-size: 4rem;"></i>
+              <p class="mt-3">Unggah foto daun di sebelah kiri<br>untuk memulai pemindaian penyakit.</p>
+            </div>
+
+            <div id="kontenHasil" class="row d-none">
+              <div class="col-md-5 mb-4 mb-md-0">
+                <div class="border rounded p-2 text-center bg-light h-100">
+                  <p class="text-muted small mb-2">Citra yang dianalisis:</p>
+                  <img id="imagePreview" src="" alt="Preview" class="img-fluid rounded" style="max-height: 250px; object-fit: cover;">
+                </div>
+              </div>
+
+              <div class="col-md-7">
+                <span class="badge bg-light-danger text-danger mb-2 px-3 py-2 border border-danger">Terdeteksi Anomali</span>
+                
+                <h3 class="mb-1" id="teksPenyakit">Nama Penyakit</h3>
+                <p class="text-muted mb-3">Tingkat Kepercayaan (Akurasi): <strong class="text-primary" id="teksAkurasi">90%</strong></p>
+                <hr>
+                <h6 class="mb-2 text-dark"><i class="ti ti-bulb text-warning me-1"></i> Rekomendasi Penanganan:</h6>
+                <ol class="ps-3 mb-0 text-muted" id="listSolusi">
+                  </ol>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer class="pc-footer"><div class="footer-wrapper container-fluid"><div class="row"><div class="col my-1"><p class="m-0 text-muted">Sistem Pendukung Keputusan Pertanian © 2026</p></div></div></div></footer> 
+
+<script src="assets/js/plugins/popper.min.js"></script>
+<script src="assets/js/plugins/simplebar.min.js"></script>
+<script src="assets/js/plugins/bootstrap.min.js"></script>
+<script src="assets/js/fonts/custom-font.js"></script>
+<script src="assets/js/script.js"></script>
+<script src="assets/js/theme.js"></script>
+<script src="assets/js/plugins/feather.min.js"></script>
+<script>change_box_container('false'); layout_caption_change('true'); layout_rtl_change('false'); preset_change("preset-1");</script>
+
+<script>
+    const fileInput = document.getElementById('fileUpload');
+    const fileInfoBox = document.getElementById('fileInfo');
+    const fileNameSpan = document.getElementById('fileName');
+    const imagePreview = document.getElementById('imagePreview');
+
+    // 1. Membaca gambar saat file dipilih untuk preview
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if(file) {
+            fileInfoBox.classList.remove('d-none');
+            fileNameSpan.textContent = file.name;
+
+            // Buat preview gambar
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // 2. Fungsi Mengirim (POST) Gambar menggunakan FormData
+    document.getElementById('btnDiagnosis').addEventListener('click', function() {
+        const tanaman = document.getElementById('jenisTanaman').value;
+        const file = fileInput.files[0];
+
+        if(!tanaman || !file) {
+            alert('Harap pilih jenis tanaman dan unggah foto daunnya!');
+            return;
+        }
+
+        // Siapkan struktur FormData (karena kita kirim file fisik, bukan JSON biasa)
+        const formData = new FormData();
+        formData.append('tanaman', tanaman);
+        formData.append('file', file);
+
+        // Ganti tombol jadi loading
+        const btn = document.getElementById('btnDiagnosis');
+        const teksAsli = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Memindai...';
+        btn.disabled = true;
+
+        fetch('http://127.0.0.1:8000/api/klinik/diagnosis', {
+            method: 'POST',
+            body: formData // Kirim form data
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Gagal memproses gambar');
+            return response.json();
+        })
+        .then(data => {
+            // Sembunyikan layar awal, munculkan hasil
+            document.getElementById('pesanAwal').classList.add('d-none');
+            document.getElementById('kontenHasil').classList.remove('d-none');
+
+            // Isi UI dengan data respons API
+            document.getElementById('teksPenyakit').innerText = data.hasil_diagnosis;
+            document.getElementById('teksAkurasi').innerText = data.akurasi_ai + "%";
+
+            const listSolusi = document.getElementById('listSolusi');
+            listSolusi.innerHTML = '';
+            data.rekomendasi_tindakan.forEach(solusi => {
+                listSolusi.innerHTML += `<li class="mb-1">${solusi}</li>`;
+            });
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Terjadi kesalahan sistem saat mendiagnosis gambar.");
+        })
+        .finally(() => {
+            btn.innerHTML = teksAsli;
+            btn.disabled = false;
+        });
+    });
+</script>
+</body>
+</html>
