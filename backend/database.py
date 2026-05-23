@@ -18,3 +18,11 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Base class untuk membuat model/tabel
 Base = declarative_base()
+
+# --- FUNGSI INJEKSI SESI DATABASE ---
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
