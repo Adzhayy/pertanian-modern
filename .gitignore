@@ -8,3 +8,5 @@ __pycache__/
 
 # Folder Upload Gambar Lokal
 backend/uploads/
+.env
+backend/.env
