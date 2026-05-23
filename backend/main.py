@@ -10,14 +10,17 @@ import shutil
 import random
 import urllib.request
 import urllib.parse
+from dotenv import load_dotenv
 
-# --- KREDENSIAL BOT TELEGRAM ---
-TELEGRAM_BOT_TOKEN = "8837001995:AAFtsglN7VejD9prEbdGTjrGZBTHvhp5PQo"
-TELEGRAM_CHAT_ID = "8146044956"
+# --- MEMUAT KREDENSIAL DARI .ENV ---
+load_dotenv()
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 def kirim_pesan_telegram(pesan: str):
     """Fungsi ajaib untuk mengirim teks ke Telegram"""
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        print("Peringatan: Token atau Chat ID Telegram tidak ditemukan di .env")
         return False
     
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
@@ -110,7 +113,6 @@ def tambah_lahan(lahan: LahanCreate, db: Session = Depends(get_db)):
     db.add_all(jadwal_list)
     db.commit()
 
-    # Memicu notifikasi saat lahan baru dibuat
     pesan = f"🎉 *Lahan Baru Terdaftar!* 🎉\n\nLahan: *{lahan_baru.nama_lahan}*\nKomoditas: *{tanaman.nama_tanaman}*\n\nSistem telah membangkitkan {len(jadwal_list)} tugas harian otomatis hingga masa panen tiba. Selamat bertani! 🚜"
     kirim_pesan_telegram(pesan)
     
@@ -134,10 +136,8 @@ def get_jadwal_hari_ini(db: Session = Depends(get_db)):
         hasil.append({"id": j.id, "tugas": j.jenis_tugas, "lahan": lahan.nama_lahan, "status": j.status_selesai})
     return hasil
 
-# --- ENDPOINT BARU: TESTING TELEGRAM ---
 @app.get("/api/telegram/test")
 def test_telegram_hari_ini(db: Session = Depends(get_db)):
-    """Akses URL ini di browser untuk memaksa bot mengirim jadwal hari ini"""
     hari_ini = date.today()
     jadwal = db.query(models.JadwalPerawatan).filter(models.JadwalPerawatan.tanggal_tugas == hari_ini).all()
     
