@@ -53,7 +53,7 @@
             params.append('username', document.getElementById('inputUsername').value);
             params.append('password', document.getElementById('inputPassword').value);
 
-            fetch('http://127.0.0.1:8000/api/login', {
+            fetch('https://pertanian-modern-production.up.railway.app/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
