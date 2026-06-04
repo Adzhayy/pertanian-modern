@@ -149,11 +149,13 @@
             <h5>Daftar Perawatan (Hari Ini)</h5>
           </div>
           <div class="card-body p-0">
+            <!-- TAMBAHAN: Tempat memunculkan notifikasi sukses Telegram -->
+            <div id="pesanAlertDashboard" class="alert d-none mx-4 mt-3" role="alert"></div>
+
             <div class="table-responsive">
               <table class="table table-hover mb-0">
                 <thead>
                   <tr>
-                    <!-- PERBAIKAN: Menambahkan kolom No dan menyesuaikan jumlah kolom HTML -->
                     <th width="5%">No</th>
                     <th>Nama Lahan</th>
                     <th>Jenis Tugas</th>
@@ -233,7 +235,6 @@
                     }
 
                     data.forEach((item, index) => {
-                        // LOGIKA TOMBOL: Jika sudah selesai tampilkan lencana hijau, jika belum tampilkan tombol
                         let aksiAtauStatus = '';
                         if (item.status === 'Selesai') {
                             aksiAtauStatus = `<span class="badge bg-success py-2 px-3"><i class="ti ti-check me-1"></i> Selesai</span>`;
@@ -279,9 +280,21 @@
             return response.json();
         })
         .then(data => {
-            // Jika sukses, ganti tombol menjadi lencana (badge) "Selesai" warna hijau
+            // 1. Ganti tombol menjadi lencana "Selesai" warna hijau
             const parentTd = tombolElement.parentElement;
             parentTd.innerHTML = `<span class="badge bg-success py-2 px-3"><i class="ti ti-check me-1"></i> Selesai</span>`;
+            
+            // 2. Munculkan Alert Sukses bahwa notifikasi Telegram telah dikirim
+            const alertBox = document.getElementById('pesanAlertDashboard');
+            if (alertBox) {
+                alertBox.className = 'alert alert-success d-block mx-4 mt-3 shadow-sm';
+                alertBox.innerHTML = `<i class="ti ti-bell-ringing me-2 fs-5 align-middle"></i> <strong>Cek Telegram!</strong> ${data.pesan}`;
+                
+                // Hilangkan notifikasi secara otomatis setelah 5 detik
+                setTimeout(() => { 
+                    alertBox.classList.replace('d-block', 'd-none'); 
+                }, 5000);
+            }
         })
         .catch(err => {
             console.error(err);
