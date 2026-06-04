@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriDSS - Sistem Pertanian Terpadu</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Palet Warna Kustom Pilihan Anda */
+            --olive-green: #A5BA50;  /* Hijau Zaitun / Aksen Terang */
+            --forest-dark: #133A1B;  /* Hijau Hutan Gelap / Teks & Background Gelap */
+            --cream-bg: #E4DEAE;     /* Krem Kekuningan / Background Terang */
+            --white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--forest-dark);
+            background-color: var(--cream-bg);
+        }
+
+        /* Navbar Custom */
+        .navbar-custom {
+            /* Warna krem dengan sedikit transparansi untuk efek blur */
+            background-color: rgba(228, 222, 174, 0.95); 
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(19, 58, 27, 0.1);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--forest-dark) !important;
+            font-size: 1.5rem;
+        }
+        .nav-link {
+            font-weight: 600;
+            color: var(--forest-dark);
+            transition: color 0.3s;
+        }
+        .nav-link:hover {
+            color: var(--olive-green);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            height: 100vh;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            background: url('https://images.unsplash.com/photo-1592982537443-d181cb30fa00?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+        }
+        .hero-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            /* Gradient menggunakan warna Hijau Hutan Gelap (#133A1B) */
+            background: linear-gradient(135deg, rgba(19, 58, 27, 0.9) 0%, rgba(19, 58, 27, 0.6) 100%);
+            z-index: 1;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            color: var(--white);
+        }
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            color: var(--cream-bg);
+        }
+        .hero-subtitle {
+            font-size: 1.25rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            color: var(--white);
+        }
+
+        /* Buttons */
+        .btn-custom-primary {
+            background-color: var(--olive-green);
+            color: var(--forest-dark);
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(165, 186, 80, 0.4);
+        }
+        .btn-custom-primary:hover {
+            background-color: var(--forest-dark);
+            color: var(--cream-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(19, 58, 27, 0.4);
+        }
+        
+        .btn-custom-outline {
+            background-color: transparent;
+            color: var(--cream-bg);
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            border: 2px solid var(--cream-bg);
+            transition: all 0.3s ease;
+        }
+        .btn-custom-outline:hover {
+            background-color: var(--cream-bg);
+            color: var(--forest-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 100px 0;
+            background-color: var(--cream-bg);
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+            font-weight: 700;
+            color: var(--forest-dark);
+        }
+        .feature-card {
+            background: var(--white);
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            height: 100%;
+            box-shadow: 0 10px 30px rgba(19, 58, 27, 0.05);
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--olive-green);
+        }
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background-color: var(--olive-green);
+            color: var(--forest-dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 25px;
+            box-shadow: 0 4px 10px rgba(165, 186, 80, 0.3);
+        }
+        .feature-title {
+            font-weight: 700;
+            color: var(--forest-dark);
+            margin-bottom: 15px;
+        }
+        .feature-desc {
+            color: rgba(19, 58, 27, 0.7);
+            line-height: 1.6;
+        }
+
+        /* Call to Action Banner */
+        .cta-section {
+            background-color: var(--forest-dark);
+            padding: 80px 0;
+            border-top: 5px solid var(--olive-green);
+        }
+        .btn-cta {
+            background-color: var(--olive-green);
+            color: var(--forest-dark);
+            font-weight: 700;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+            border: 2px solid var(--olive-green);
+        }
+        .btn-cta:hover {
+            background-color: transparent;
+            color: var(--olive-green);
+        }
+
+        /* Footer */
+        footer {
+            background-color: #0b2210; /* Warna lebih gelap dari forest-dark */
+            color: rgba(228, 222, 174, 0.7);
+            padding: 40px 0 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-leaf-fill me-2" style="color: var(--olive-green);"></i>AgriDSS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-toggle="target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link px-3" href="#beranda">Beranda</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#fitur">Fitur</a></li>
+                    <!-- Tautan diarahkan masuk ke folder frontend -->
+                    <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
+                        <a href="frontend/login.html" class="btn btn-custom-primary btn-sm px-4 py-2">Masuk / Daftar</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="beranda" class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="container hero-content">
+            <div class="row">
+                <div class="col-lg-8 col-md-10">
+                    <span class="badge mb-3 px-3 py-2 rounded-pill fw-bold" style="background-color: var(--olive-green); color: var(--forest-dark);">Sistem Cerdas Pertanian 4.0</span>
+                    <h1 class="hero-title">Panen Lebih Baik<br>dengan Keputusan yang Tepat.</h1>
+                    <p class="hero-subtitle">AgriDSS membantu Anda memantau lahan, menganalisis pH tanah, dan mendiagnosis penyakit tanaman secara langsung dari genggaman tangan Anda.</p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <!-- Tautan diarahkan masuk ke folder frontend -->
+                        <a href="frontend/login.html" class="btn btn-custom-primary">Mulai Kelola Lahan <i class="bi bi-arrow-right ms-2"></i></a>
+                        <a href="#fitur" class="btn btn-custom-outline">Pelajari Fitur</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fitur Section -->
+    <section id="fitur" class="features-section">
+        <div class="container">
+            <h2 class="section-title">Teknologi untuk Pertanian Anda</h2>
+            <div class="row g-4">
+                <!-- Fitur 1 -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-map-fill"></i>
+                        </div>
+                        <h4 class="feature-title">Manajemen Lahan</h4>
+                        <p class="feature-desc">Petakan dan catat seluruh blok lahan Anda. Pantau luas, komoditas yang ditanam, dan estimasi waktu panen dengan mudah.</p>
+                    </div>
+                </div>
+                <!-- Fitur 2 -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-moisture"></i>
+                        </div>
+                        <h4 class="feature-title">Analisis Tanah Cerdas</h4>
+                        <p class="feature-desc">Masukkan data pH tanah, dan sistem kami akan otomatis memberikan rekomendasi tanaman apa yang paling cocok untuk ditanam.</p>
+                    </div>
+                </div>
+                <!-- Fitur 3 -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-heart-pulse-fill"></i>
+                        </div>
+                        <h4 class="feature-title">Klinik Tanaman</h4>
+                        <p class="feature-desc">Punya tanaman sakit? Catat gejalanya di klinik kami, dapatkan rekam medis tanaman, dan rekomendasi penanganan secara sistematis.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Banner -->
+    <section class="cta-section">
+        <div class="container text-center py-4">
+            <h3 class="fw-bold mb-3" style="color: var(--cream-bg);">Siap Modernisasi Pertanian Anda?</h3>
+            <p class="mb-4" style="color: var(--olive-green);">Bergabunglah dengan petani modern lainnya dan mulai gunakan data untuk meningkatkan hasil panen.</p>
+            <!-- Tautan diarahkan masuk ke folder frontend -->
+            <a href="frontend/login.html" class="btn-cta mt-2">Buat Akun Gratis Sekarang</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center">
+            <div class="mb-3">
+                <i class="bi bi-leaf-fill fs-3" style="color: var(--olive-green);"></i>
+            </div>
+            <h5 class="fw-bold mb-3" style="color: var(--cream-bg);">AgriDSS</h5>
+            <p class="small mb-0">&copy; 2026 Sistem Pendukung Keputusan Pertanian Terpadu. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
