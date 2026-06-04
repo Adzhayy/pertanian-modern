@@ -7,11 +7,13 @@ from sqlalchemy.orm import sessionmaker
 # Memuat variabel rahasia dari file .env
 load_dotenv()
 
-# Mengambil URL dari .env, jika tidak ada, gunakan nilai default kosong
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:@localhost:3306/db_agridss")
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", 
+    "mysql+pymysql://root:@127.0.0.1:3306/pertanian-modern" # <-- Ganti dengan nama db lokalmu
+)
 
 # Membuat 'mesin' penghubung ke MySQL
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(DATABASE_URL)
 
 # Membuat sesi database
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
