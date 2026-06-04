@@ -1,84 +1,350 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk - AgriDSS</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masuk & Daftar | AgriDSS</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2 family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --olive-green: #A5BA50;  /* Hijau Zaitun */
+      --forest-dark: #133A1B;  /* Hijau Hutan Gelap */
+      --cream-bg: #E4DEAE;     /* Krem Kekuningan */
+      --white: #FFFFFF;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--cream-bg);
+      color: var(--forest-dark);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Card Box Kontainer Utama */
+    .auth-card {
+      background-color: var(--white);
+      border-radius: 24px;
+      box-shadow: 0 15px 35px rgba(19, 58, 27, 0.1);
+      overflow: hidden;
+      max-width: 900px;
+      width: 100%;
+      min-height: 550px;
+      border: 1px solid rgba(19, 58, 27, 0.05);
+    }
+
+    /* Sisi Kiri: Dekorasi Gambar/Aksen Tonal */
+    .auth-side-banner {
+      background: linear-gradient(135deg, rgba(19, 58, 27, 0.95) 0%, rgba(165, 186, 80, 0.9) 100%), 
+                  url('https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
+      color: var(--cream-bg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 45px;
+    }
+
+    .auth-side-banner h2 {
+      font-weight: 700;
+      color: var(--cream-bg);
+    }
+
+    /* Sisi Kanan: Area Form */
+    .auth-form-side {
+      padding: 45px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .form-title {
+      font-weight: 700;
+      color: var(--forest-dark);
+      margin-bottom: 8px;
+    }
+
+    /* Input Styling */
+    .form-control {
+      border: 2px solid rgba(19, 58, 27, 0.1);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-weight: 500;
+      color: var(--forest-dark);
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--olive-green);
+      box-shadow: 0 0 0 4px rgba(165, 186, 80, 0.15);
+      color: var(--forest-dark);
+    }
+
+    /* Tombol Utama */
+    .btn-auth {
+      background-color: var(--forest-dark);
+      color: var(--cream-bg);
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: 700;
+      border: none;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+
+    .btn-auth:hover {
+      background-color: var(--olive-green);
+      color: var(--forest-dark);
+      transform: translateY(-1px);
+    }
+
+    /* Link Toggle Form */
+    .auth-toggle-link {
+      color: var(--olive-green);
+      font-weight: 700;
+      text-decoration: none;
+      transition: color 0.3s;
+      cursor: pointer;
+    }
+
+    .auth-toggle-link:hover {
+      color: var(--forest-dark);
+      text-decoration: underline;
+    }
+
+    /* Badge Custom */
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      color: var(--olive-green);
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
-<body class="bg-light d-flex align-items-center vh-100">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-4">
-                <div class="card shadow-sm border-0 rounded-4">
-                    <div class="card-body p-4 p-md-5">
-                        <div class="text-center mb-4">
-                            <h4 class="fw-bold">AgriDSS</h4>
-                            <p class="text-muted">Sistem Pendukung Keputusan Pertanian</p>
-                        </div>
-                        
-                        <form id="formLogin">
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Username</label>
-                                <input type="text" id="inputUsername" class="form-control" placeholder="Masukkan username" required>
-                            </div>
-                            <div class="mb-4">
-                                <label class="form-label fw-semibold">Password</label>
-                                <input type="password" id="inputPassword" class="form-control" placeholder="Masukkan sandi" required>
-                            </div>
-                            <button type="submit" id="btnLogin" class="btn btn-success w-100 py-2">Masuk ke Sistem</button>
-                        </form>
-                        
-                        <div id="pesanError" class="alert alert-danger mt-3 d-none text-center" role="alert" style="font-size: 14px;"></div>
-                    </div>
-                </div>
-            </div>
+<body>
+
+  <div class="auth-card">
+    <div class="row g-0 h-100">
+      
+      <!-- Sisi Banner Dekorasi (Hanya muncul di layar sedang ke atas) -->
+      <div class="col-lg-5 d-none d-lg-flex auth-side-banner">
+        <div class="brand-badge fs-4">
+          <i class="bi bi-leaf-fill text-white"></i> <span class="text-white">AgriDSS</span>
         </div>
+        <h2 class="mb-3">Ekosistem Digital Pertanian Modern</h2>
+        <p class="opacity-75 lead fs-6">Satu aplikasi terintegrasi untuk mengontrol kondisi tanah, memetakan waktu panen, serta mengobati tanaman secara presisi.</p>
+      </div>
+
+      <!-- Sisi Form Interaktif -->
+      <div class="col-lg-7 col-12 auth-form-side">
+        
+        <!-- Wadah Pesan/Alert Informasi -->
+        <div id="authAlert" class="alert d-none mb-4" role="alert"></div>
+
+        <!-- FORMULIR LOGIN (MASUK) -->
+        <div id="loginFormContainer">
+          <h3 class="form-title">Selamat Datang Kembali 👋</h3>
+          <p class="text-muted mb-4">Silakan masuk menggunakan akun pertanian Anda yang terdaftar.</p>
+
+          <form id="formLogin">
+            <div class="mb-3">
+              <label for="loginUsername" class="form-label fw-bold small">Username Akun</label>
+              <input type="text" class="form-control" id="loginUsername" placeholder="Masukkan username Anda" required>
+            </div>
+            <div class="mb-4">
+              <label for="loginPassword" class="form-label fw-bold small">Kata Sandi</label>
+              <input type="password" class="form-control" id="loginPassword" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-auth mb-3" id="btnLoginSubmit">
+              Masuk Sekarang <i class="bi bi-box-arrow-in-right ms-1"></i>
+            </button>
+          </form>
+
+          <p class="text-center text-muted mb-0 small">
+            Belum memiliki akun? 
+            <span class="auth-toggle-link" onclick="toggleAuthForm('register')">Daftar Akun Baru</span>
+          </p>
+        </div>
+
+        <!-- FORMULIR REGISTER (DAFTAR AKUN BARU) -->
+        <div id="registerFormContainer" class="d-none">
+          <h3 class="form-title">Mulai Bertani Modern 🌾</h3>
+          <p class="text-muted mb-4">Daftarkan akun petani Anda untuk menggunakan seluruh fitur AgriDSS secara gratis.</p>
+
+          <form id="formRegister">
+            <div class="mb-3">
+              <label for="registerUsername" class="form-label fw-bold small">Buat Username</label>
+              <input type="text" class="form-control" id="registerUsername" placeholder="Contoh: petani_modern" required>
+              <div class="form-text text-muted small">Hanya huruf kecil, angka, atau garis bawah.</div>
+            </div>
+            <div class="mb-4">
+              <label for="registerPassword" class="form-label fw-bold small">Buat Kata Sandi</label>
+              <input type="password" class="form-control" id="registerPassword" placeholder="Minimal 6 karakter" required>
+            </div>
+            <button type="submit" class="btn btn-auth mb-3" id="btnRegisterSubmit">
+              Buat Akun Baru <i class="bi bi-person-plus-fill ms-1"></i>
+            </button>
+          </form>
+
+          <p class="text-center text-muted mb-0 small">
+            Sudah memiliki akun? 
+            <span class="auth-toggle-link" onclick="toggleAuthForm('login')">Masuk di Sini</span>
+          </p>
+        </div>
+
+      </div>
+
     </div>
+  </div>
 
-    <script>
-        document.getElementById('formLogin').addEventListener('submit', function(e) {
-            e.preventDefault(); // Mencegah form memuat ulang halaman
-            
-            const btn = document.getElementById('btnLogin');
-            const pesanError = document.getElementById('pesanError');
-            
-            // Ubah tombol jadi loading
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memeriksa...';
-            btn.disabled = true;
-            pesanError.classList.add('d-none'); // Sembunyikan error lama
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-            // PENTING: FastAPI OAuth2 meminta format 'x-www-form-urlencoded', bukan JSON!
-            const params = new URLSearchParams();
-            params.append('username', document.getElementById('inputUsername').value);
-            params.append('password', document.getElementById('inputPassword').value);
+  <!-- LOGIKA PENGENDALI API & ANTARMUKA -->
+  <script>
+    // URL Backend Resmi di Server Railway Singapura Anda
+    const apiBaseUrl = 'https://pertanian-modern-production.up.railway.app/api';
 
-            fetch('https://pertanian-modern-production.up.railway.app/api/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: params
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Username atau password salah!');
-                return response.json();
-            })
-            .then(data => {
-                // SIMPAN TOKEN KE DALAM MEMORI BROWSER
-                localStorage.setItem('agridss_token', data.access_token);
-                
-                // Lempar pengguna ke halaman Dashboard/Lahan
-                window.location.href = 'lahan.html';
-            })
-            .catch(err => {
-                // Jika gagal, tampilkan pesan merah dan normalkan tombol
-                pesanError.textContent = err.message;
-                pesanError.classList.remove('d-none');
-                btn.innerHTML = 'Masuk ke Sistem';
-                btn.disabled = false;
-            });
-        });
-    </script>
+    // Fungsi beralih tampilan antara form Login dan Register
+    function toggleAuthForm(target) {
+      const loginBox = document.getElementById('loginFormContainer');
+      const registerBox = document.getElementById('registerFormContainer');
+      const alertBox = document.getElementById('authAlert');
+
+      // Sembunyikan alert saat berpindah form
+      alertBox.className = "alert d-none";
+
+      if (target === 'register') {
+        loginBox.classList.add('d-none');
+        registerBox.classList.remove('d-none');
+      } else {
+        registerBox.classList.add('d-none');
+        loginBox.classList.remove('d-none');
+      }
+    }
+
+    // Fungsi pembantu menampilkan pesan sukses/gagal di layar
+    function tampilkanPesan(pesan, tipe = 'danger') {
+      const alertBox = document.getElementById('authAlert');
+      alertBox.className = `alert alert-${tipe} d-block`;
+      alertBox.innerHTML = tipe === 'success' 
+        ? `<i class="bi bi-check-circle-fill me-2"></i> ${pesan}`
+        : `<i class="bi bi-exclamation-triangle-fill me-2"></i> ${pesan}`;
+    }
+
+    // --- PROSES SUBMIT DAFTAR (REGISTER) ---
+    document.getElementById('formRegister').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const usernameInput = document.getElementById('registerUsername').value.trim();
+      const passwordInput = document.getElementById('registerPassword').value;
+      const btn = document.getElementById('btnRegisterSubmit');
+      const teksAsli = btn.innerHTML;
+
+      // Validasi sederhana panjang sandi
+      if (passwordInput.length < 6) {
+        tampilkanPesan('Kata sandi minimal harus terdiri dari 6 karakter!');
+        return;
+      }
+
+      // Ubah tombol menjadi loading
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Mendaftarkan...';
+      btn.disabled = true;
+
+      // Kirim data registrasi ke API Railway
+      fetch(`${apiBaseUrl}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: usernameInput,
+          password: passwordInput
+        })
+      })
+      .then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.detail || 'Registrasi gagal, silakan coba lagi.');
+        }
+        return data;
+      })
+      .then(data => {
+        // Berhasil mendaftar
+        tampilkanPesan('Akun berhasil dibuat! Silakan masuk dengan username baru Anda.', 'success');
+        document.getElementById('formRegister').reset();
+        
+        // Pindahkan pengguna secara otomatis ke formulir login setelah 2 detik
+        setTimeout(() => {
+          toggleAuthForm('login');
+          document.getElementById('loginUsername').value = usernameInput;
+        }, 2000);
+      })
+      .catch(error => {
+        tampilkanPesan(error.message);
+      })
+      .finally(() => {
+        btn.innerHTML = teksAsli;
+        btn.disabled = false;
+      });
+    });
+
+    // --- PROSES SUBMIT MASUK (LOGIN) ---
+    document.getElementById('formLogin').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const usernameInput = document.getElementById('loginUsername').value.trim();
+      const passwordInput = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('btnLoginSubmit');
+      const teksAsli = btn.innerHTML;
+
+      // Ubah tombol menjadi loading
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memverifikasi...';
+      btn.disabled = true;
+
+      // Sesuai standar OAuth2 FastAPI, data dikirim dalam bentuk URL-Encoded form data
+      const formData = new URLSearchParams();
+      formData.append('username', usernameInput);
+      formData.append('password', passwordInput);
+
+      fetch(`${apiBaseUrl}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData
+      })
+      .then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.detail || 'Username atau kata sandi Anda salah.');
+        }
+        return data;
+      })
+      .then(data => {
+        // Simpan tiket KTP Digital (JWT Token) ke memori browser lokal
+        localStorage.setItem('agridss_token', data.access_token);
+        tampilkanPesan('Login berhasil! Mengalihkan ke dashboard...', 'success');
+
+        // Pindahkan ke dashboard utama (frontend/index.html)
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1200);
+      })
+      .catch(error => {
+        tampilkanPesan(error.message);
+      })
+      .finally(() => {
+        btn.innerHTML = teksAsli;
+        btn.disabled = false;
+      });
+    });
+  </script>
 </body>
 </html>
