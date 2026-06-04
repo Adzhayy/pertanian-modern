@@ -285,7 +285,7 @@
     function muatDataLahan() {
         const token = localStorage.getItem('agridss_token');
 
-        fetch('http://127.0.0.1:8000/api/lahan', {
+        fetch('https://pertanian-modern-production.up.railway.app/api/lahan', {
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + token
@@ -353,7 +353,7 @@
         };
 
         // Kirim permintaan POST
-        fetch('http://127.0.0.1:8000/api/lahan', {
+        fetch('https://pertanian-modern-production.up.railway.app/api/lahan', {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
