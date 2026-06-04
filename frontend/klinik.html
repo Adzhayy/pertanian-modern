@@ -164,80 +164,59 @@
 <script>change_box_container('false'); layout_caption_change('true'); layout_rtl_change('false'); preset_change("preset-1");</script>
 
 <script>
-    const fileInput = document.getElementById('fileUpload');
-    const fileInfoBox = document.getElementById('fileInfo');
-    const fileNameSpan = document.getElementById('fileName');
-    const imagePreview = document.getElementById('imagePreview');
+    const apiBaseUrl = 'http://127.0.0.1:8000/api';
 
-    // 1. Membaca gambar saat file dipilih untuk preview
-    fileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if(file) {
-            fileInfoBox.classList.remove('d-none');
-            fileNameSpan.textContent = file.name;
-
-            // Buat preview gambar
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                imagePreview.src = e.target.result;
-            }
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // 2. Fungsi Mengirim (POST) Gambar menggunakan FormData
-    document.getElementById('btnDiagnosis').addEventListener('click', function() {
-        const tanaman = document.getElementById('jenisTanaman').value;
-        const file = fileInput.files[0];
-
-        if(!tanaman || !file) {
-            alert('Harap pilih jenis tanaman dan unggah foto daunnya!');
+    document.getElementById('formKlinik').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const token = localStorage.getItem('agridss_token');
+        if (!token) {
+            window.location.href = 'login.html';
             return;
         }
 
-        // Siapkan struktur FormData (karena kita kirim file fisik, bukan JSON biasa)
-        const formData = new FormData();
-        formData.append('tanaman', tanaman);
-        formData.append('file', file);
-
-        // Ganti tombol jadi loading
         const btn = document.getElementById('btnDiagnosis');
         const teksAsli = btn.innerHTML;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Memindai...';
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menganalisis...';
         btn.disabled = true;
 
-        fetch('http://127.0.0.1:8000/api/klinik/diagnosis', {
+        const formData = new FormData(this);
+
+        fetch(`${apiBaseUrl}/klinik/diagnosis`, {
             method: 'POST',
-            body: formData // Kirim form data
+            headers: {
+                'Authorization': 'Bearer ' + token // <-- Kunci JWT masuk di sini
+                // Catatan: Jangan set Content-Type untuk FormData, biarkan browser yang atur
+            },
+            body: formData
         })
         .then(response => {
-            if (!response.ok) throw new Error('Gagal memproses gambar');
+            if (!response.ok) {
+                if (response.status === 401) window.location.href = 'login.html';
+                throw new Error('Gagal mendiagnosis');
+            }
             return response.json();
         })
         .then(data => {
-            // Sembunyikan layar awal, munculkan hasil
-            document.getElementById('pesanAwal').classList.add('d-none');
-            document.getElementById('kontenHasil').classList.remove('d-none');
-
-            // Isi UI dengan data respons API
-            document.getElementById('teksPenyakit').innerText = data.hasil_diagnosis;
-            document.getElementById('teksAkurasi').innerText = data.akurasi_ai + "%";
-
-            const listSolusi = document.getElementById('listSolusi');
-            listSolusi.innerHTML = '';
-            data.rekomendasi_tindakan.forEach(solusi => {
-                listSolusi.innerHTML += `<li class="mb-1">${solusi}</li>`;
-            });
+            // Tampilkan hasil diagnosismu di sini
+            console.log("Hasil AI:", data);
+            alert(`Diagnosis Selesai! Penyakit: ${data.hasil_diagnosis}`);
+            // (Sesuaikan dengan ID elemen HTML hasil diagnosismu)
         })
         .catch(err => {
             console.error(err);
-            alert("Terjadi kesalahan sistem saat mendiagnosis gambar.");
+            alert("Terjadi kesalahan sistem!");
         })
         .finally(() => {
             btn.innerHTML = teksAsli;
             btn.disabled = false;
         });
     });
+
+    function logout() {
+        localStorage.removeItem('agridss_token');
+        window.location.href = 'login.html';
+    }
 </script>
 </body>
 </html>

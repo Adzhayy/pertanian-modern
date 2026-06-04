@@ -53,8 +53,8 @@
               <img src="assets/images/user/avatar-1.jpg" alt="user-image" class="user-avtar wid-45 rounded-circle" />
             </div>
             <div class="flex-grow-1 ms-3 me-2">
-              <h6 class="mb-0">Petani Admin</h6>
-              <small>Administrator</small>
+              <h6 class="mb-0">Sistem Akun</h6>
+              <small>Petani Terdaftar</small>
             </div>
           </div>
         </div>
@@ -95,24 +95,6 @@
 
     <div class="ms-auto">
       <ul class="list-unstyled">
-        <!-- Notification Dropdown -->
-        <li class="dropdown pc-h-item">
-          <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-            <svg class="pc-icon">
-              <use xlink:href="#custom-notification"></use>
-            </svg>
-            <span class="badge bg-success pc-h-badge">0</span>
-          </a>
-          <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown">
-            <div class="dropdown-header d-flex align-items-center justify-content-between">
-              <h5 class="m-0">Notifikasi Telegram</h5>
-            </div>
-            <div class="dropdown-body text-wrap header-notification-scroll position-relative" style="max-height: calc(100vh - 215px)">
-              <p class="text-center text-muted mt-4">Belum ada jadwal penyiraman hari ini.</p>
-            </div>
-          </div>
-        </li>
-        
         <!-- Profile Dropdown -->
         <li class="dropdown pc-h-item header-user-profile">
           <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
@@ -123,32 +105,10 @@
               <h5 class="m-0">Profil Pengguna</h5>
             </div>
             <div class="dropdown-body">
-              <div class="profile-notification-scroll position-relative" style="max-height: calc(100vh - 225px)">
-                <div class="d-flex mb-1">
-                  <div class="flex-shrink-0">
-                    <img src="assets/images/user/avatar-1.jpg" alt="user-image" class="user-avtar wid-35" />
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <h6 class="mb-1">Petani Admin</h6>
-                    <span>ID Telegram: <i>Belum ditautkan</i></span>
-                  </div>
-                </div>
-                <hr class="border-secondary border-opacity-50" />
-                <a href="#" class="dropdown-item">
-                  <span>
-                    <svg class="pc-icon text-muted me-2">
-                      <use xlink:href="#custom-setting-outline"></use>
-                    </svg>
-                    <span>Pengaturan Akun</span>
-                  </span>
-                </a>
-                <hr class="border-secondary border-opacity-50" />
-                <div class="d-grid mb-3">
-                  <button class="btn btn-primary">
-                    <svg class="pc-icon me-2">
-                      <use xlink:href="#custom-logout-1-outline"></use></svg>Keluar
-                  </button>
-                </div>
+              <div class="d-grid mb-3 mt-3">
+                <button class="btn btn-danger" onclick="logout()">
+                  <i class="ti ti-logout me-2"></i>Keluar
+                </button>
               </div>
             </div>
           </div>
@@ -189,10 +149,6 @@
           <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
             <h5 class="mb-0">Daftar Lahan Aktif</h5>
             <div class="d-flex align-items-center mt-2 mt-sm-0">
-              <div class="form-check form-switch me-3" title="Fitur dalam tahap pengembangan">
-                <input class="form-check-input" type="checkbox" id="iotSwitch" disabled>
-                <label class="form-check-label text-muted" for="iotSwitch"><small>Siram Otomatis (IoT) - <i>Segera Hadir</i></small></label>
-              </div>
               <!-- Tombol untuk memicu Modal Bootstrap -->
               <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#tambahLahanModal">
                 <i class="ti ti-plus"></i> Tambah Tanaman
@@ -208,14 +164,14 @@
               <table class="table table-hover mb-0" id="tabelLahan">
                 <thead>
                   <tr>
+                    <th>No</th>
                     <th>Nama Lahan</th>
                     <th>Tanaman</th>
                     <th>Tanggal Tanam</th>
                     <th>Estimasi Panen</th>
-                    <th>Status</th>
                   </tr>
                 </thead>
-                <!-- Bagian tbody akan diisi oleh JavaScript -->
+                <!-- ID SUDAH DISAMAKAN: dataLahanContainer -->
                 <tbody id="dataLahanContainer">
                     <tr>
                         <td colspan="5" class="text-center text-muted">Sedang memuat data lahan...</td>
@@ -250,7 +206,6 @@
             <label for="pilihTanaman" class="form-label">Pilih Jenis Tanaman</label>
             <select class="form-select" id="pilihTanaman" required>
               <option value="" selected disabled>Memuat daftar tanaman...</option>
-              <!-- Opsi ini akan diisi otomatis dari API -->
             </select>
           </div>
           <div class="mb-3">
@@ -295,11 +250,23 @@
 <script>
     const apiBaseUrl = 'http://127.0.0.1:8000/api';
 
+    // FUNGSI KELUAR (LOGOUT)
+    function logout() {
+        localStorage.removeItem('agridss_token');
+        window.location.href = 'login.html';
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
+        const token = localStorage.getItem('agridss_token');
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+
         // 1. Set Tanggal Hari Ini sebagai default di Form
         document.getElementById('tanggalTanam').valueAsDate = new Date();
 
-        // 2. Muat Data Master Tanaman ke dalam Dropdown (Select) di Form
+        // 2. Muat Data Master Tanaman ke dalam Dropdown
         fetch(`${apiBaseUrl}/tanaman`)
             .then(res => res.json())
             .then(data => {
@@ -310,56 +277,64 @@
                 });
             });
 
-        // 3. Muat Data Lahan Aktif ke dalam Tabel Utama
+        // 3. Muat Data Lahan
         muatDataLahan();
     });
 
     // Fungsi untuk mengambil dan menampilkan lahan di tabel
     function muatDataLahan() {
-        const container = document.getElementById('dataLahanContainer');
-        fetch(`${apiBaseUrl}/lahan`)
-            .then(res => res.json())
-            .then(data => {
-                container.innerHTML = ''; // Kosongkan tabel
+        const token = localStorage.getItem('agridss_token');
+
+        fetch('http://127.0.0.1:8000/api/lahan', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 401) logout();
+                throw new Error('Gagal memuat data dari server');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // ID INI SEKARANG SUDAH SAMA DENGAN HTML DI ATAS
+            const tbody = document.getElementById('dataLahanContainer'); 
+            if (tbody) {
+                tbody.innerHTML = '';
                 if (data.length === 0) {
-                    container.innerHTML = '<tr><td colspan="5" class="text-center">Belum ada lahan yang didaftarkan.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center">Belum ada lahan yang didaftarkan.</td></tr>';
                     return;
                 }
-
-                data.forEach(lahan => {
-                    // Konversi format tanggal menjadi lebih rapi
-                    const tglTanam = new Date(lahan.tanggal_tanam).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
-                    const tglPanen = new Date(lahan.estimasi_panen).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
-                    const statusBadge = lahan.status_selesai ? '<span class="badge bg-success">Selesai/Panen</span>' : '<span class="badge bg-warning">Aktif (Proses)</span>';
-
-                    const row = `
+                data.forEach((item, index) => {
+                    tbody.innerHTML += `
                         <tr>
-                            <td><strong>${lahan.nama_lahan}</strong></td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="avtar avtar-s bg-light-primary text-primary me-2"><i class="ti ti-plant-2 f-18"></i></div>
-                                    ${lahan.nama_tanaman}
-                                </div>
-                            </td>
-                            <td>${tglTanam}</td>
-                            <td class="text-primary fw-bold">${tglPanen}</td>
-                            <td>${statusBadge}</td>
+                            <td>${index + 1}</td>
+                            <td>${item.nama_lahan}</td>
+                            <td>${item.nama_tanaman}</td>
+                            <td>${item.tanggal_tanam}</td>
+                            <td><span class="badge bg-success">${item.estimasi_panen}</span></td>
                         </tr>
                     `;
-                    container.innerHTML += row;
                 });
-            })
-            .catch(err => {
-                console.error('Error fetching lahan:', err);
-                container.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Gagal memuat data. Server mungkin mati.</td></tr>';
-            });
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            const tbody = document.getElementById('dataLahanContainer'); 
+            if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Gagal memuat data. Server mungkin mati.</td></tr>';
+        });
     }
 
     // 4. Fungsi Mengirim (POST) data lahan baru dari Form
     document.getElementById('btnSimpanLahan').addEventListener('click', function() {
+        const token = localStorage.getItem('agridss_token');
         const nama = document.getElementById('namaLahan').value;
         const tanamanId = document.getElementById('pilihTanaman').value;
         const tanggal = document.getElementById('tanggalTanam').value;
+        const btn = this;
+        const teksAsli = btn.innerHTML;
 
         // Validasi Sederhana
         if(!nama || !tanamanId || !tanggal) {
@@ -367,26 +342,29 @@
             return;
         }
 
-        // Siapkan data JSON yang akan dikirim ke API
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
+        btn.disabled = true;
+
+        // Siapkan data JSON (user_id dihapus karena backend sudah pakai token JWT)
         const dataKirim = {
             nama_lahan: nama,
             tanaman_id: parseInt(tanamanId),
-            tanggal_tanam: tanggal,
-            user_id: 1 // Hardcode ke admin untuk saat ini
+            tanggal_tanam: tanggal
         };
 
         // Kirim permintaan POST
-        fetch(`${apiBaseUrl}/lahan`, {
+        fetch('http://127.0.0.1:8000/api/lahan', {
             method: 'POST',
-            headers: {
+            headers: { 
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
             },
             body: JSON.stringify(dataKirim)
         })
         .then(response => {
-            if (!response.ok) throw new Error('Gagal menyimpan data');
+            if (!response.ok) throw new Error('Gagal menyimpan lahan');
             return response.json();
-        })
+        }) // SINTAK ERROR (kurung kurawal berlebih) SUDAH DIHAPUS DI SINI
         .then(data => {
             // Tutup Modal Bootstrap
             const modalEl = document.getElementById('tambahLahanModal');
@@ -411,6 +389,10 @@
         .catch(error => {
             console.error('Error POST:', error);
             alert('Terjadi kesalahan saat menyimpan data lahan!');
+        })
+        .finally(() => {
+            btn.innerHTML = teksAsli;
+            btn.disabled = false;
         });
     });
 </script>

@@ -3,8 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from database import engine, SessionLocal
 import models
 
+
+
 # Import rute yang sudah kita pecah
-from routes import lahan, tanah, klinik
+from routes import lahan, tanah, klinik, auth_user
 
 # Membuat tabel-tabel di MySQL
 models.Base.metadata.create_all(bind=engine)
@@ -39,6 +41,7 @@ def startup_event():
     db.close()
 
 # Memasang (mendaftarkan) rute-rute yang ada di folder routes
+app.include_router(auth_user.router)
 app.include_router(lahan.router)
 app.include_router(tanah.router)
 app.include_router(klinik.router)

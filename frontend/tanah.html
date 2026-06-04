@@ -210,9 +210,33 @@
     const apiBaseUrl = 'http://127.0.0.1:8000/api';
 
     document.addEventListener("DOMContentLoaded", function() {
-        // 1. Muat Data Lahan ke Dropdown
-        fetch(`${apiBaseUrl}/lahan`)
-            .then(res => res.json())
+        // 0. Ambil token dari memori browser
+        const token = localStorage.getItem('agridss_token');
+        
+        // Jika tidak ada token (belum login), tendang ke halaman login
+        if (!token) {
+            window.location.href = 'login.html';
+            return; // Hentikan eksekusi script selanjutnya
+        }
+
+        // 1. Muat Data Lahan ke Dropdown (DENGAN TOKEN)
+        fetch(`${apiBaseUrl}/lahan`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token // <-- Kunci pembuka gerbang
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        // Token kedaluwarsa/salah
+                        localStorage.removeItem('agridss_token');
+                        window.location.href = 'login.html';
+                    }
+                    throw new Error('Gagal memuat lahan');
+                }
+                return response.json();
+            })
             .then(data => {
                 const select = document.getElementById('pilihLahan');
                 select.innerHTML = '<option value="" selected disabled>-- Pilih Lahan --</option>';
@@ -225,6 +249,12 @@
 
     // 2. Fungsi Mengirim (POST) Data Analisis
     document.getElementById('btnAnalisis').addEventListener('click', function() {
+        const token = localStorage.getItem('agridss_token');
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+
         const lahanId = document.getElementById('pilihLahan').value;
         const inputPh = document.getElementById('inputPh').value;
 
@@ -244,9 +274,13 @@
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Menganalisis...';
         btn.disabled = true;
 
+        // POST Analisis (DENGAN TOKEN)
         fetch(`${apiBaseUrl}/tanah/analisis`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token // <-- Kunci pembuka gerbang
+            },
             body: JSON.stringify(dataKirim)
         })
         .then(response => {

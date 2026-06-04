@@ -4,6 +4,7 @@ from datetime import date, timedelta
 import models, schemas
 from database import get_db
 from utils import kirim_pesan_telegram
+from auth import get_current_user
 
 router = APIRouter()
 
@@ -12,9 +13,11 @@ def get_semua_tanaman(db: Session = Depends(get_db)):
     return db.query(models.MasterTanaman).all()
 
 @router.post("/api/lahan")
-def tambah_lahan(lahan: schemas.LahanCreate, db: Session = Depends(get_db)):
+def tambah_lahan(lahan: schemas.LahanCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     tanaman = db.query(models.MasterTanaman).filter(models.MasterTanaman.id == lahan.tanaman_id).first()
-    lahan_baru = models.LahanAktif(nama_lahan=lahan.nama_lahan, user_id=lahan.user_id, tanaman_id=lahan.tanaman_id, tanggal_tanam=lahan.tanggal_tanam, status_selesai=False)
+    if not tanaman:
+        raise HTTPException(status_code=404, detail="ID Tanaman tidak ditemukan di database")
+    lahan_baru = models.LahanAktif(nama_lahan=lahan.nama_lahan, user_id=current_user.id, tanaman_id=lahan.tanaman_id, tanggal_tanam=lahan.tanggal_tanam, status_selesai=False)
     db.add(lahan_baru)
     db.commit()
     db.refresh(lahan_baru)
@@ -36,8 +39,8 @@ def tambah_lahan(lahan: schemas.LahanCreate, db: Session = Depends(get_db)):
     return {"pesan": "Berhasil!", "data": lahan_baru}
 
 @router.get("/api/lahan")
-def get_semua_lahan(db: Session = Depends(get_db)):
-    lahan_aktif = db.query(models.LahanAktif).all()
+def get_semua_lahan(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    lahan_aktif = db.query(models.LahanAktif).filter(models.LahanAktif.user_id == current_user.id).all()
     return [{"id": l.id, "nama_lahan": l.nama_lahan, "nama_tanaman": db.query(models.MasterTanaman).filter(models.MasterTanaman.id == l.tanaman_id).first().nama_tanaman, "tanggal_tanam": l.tanggal_tanam, "estimasi_panen": l.tanggal_tanam + timedelta(days=db.query(models.MasterTanaman).filter(models.MasterTanaman.id == l.tanaman_id).first().masa_panen_hari), "status_selesai": l.status_selesai} for l in lahan_aktif]
 
 @router.get("/api/jadwal/hari-ini")
@@ -58,3 +61,21 @@ def test_telegram_hari_ini(db: Session = Depends(get_db)):
     sukses = kirim_pesan_telegram(pesan)
     if sukses: return {"pesan": "Notifikasi dikirim!"}
     raise HTTPException(status_code=500, detail="Gagal kirim")
+
+@router.put("/api/jadwal/{jadwal_id}/selesai")
+def selesaikan_tugas(jadwal_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    # 1. Cari jadwal berdasarkan ID
+    jadwal = db.query(models.JadwalPerawatan).filter(models.JadwalPerawatan.id == jadwal_id).first()
+    if not jadwal:
+        raise HTTPException(status_code=404, detail="Jadwal tidak ditemukan")
+
+    # 2. Keamanan ekstra: Pastikan jadwal ini milik lahan dari user yang sedang login
+    lahan = db.query(models.LahanAktif).filter(models.LahanAktif.id == jadwal.lahan_id).first()
+    if lahan.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Anda tidak memiliki akses ke jadwal ini")
+
+    # 3. Ubah status menjadi Selesai
+    jadwal.status_selesai = "Selesai"
+    db.commit()
+    
+    return {"pesan": "Tugas berhasil ditandai selesai!"}

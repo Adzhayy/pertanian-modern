@@ -29,7 +29,7 @@
         <div class="card-body">
           <div class="d-flex align-items-center">
             <div class="flex-shrink-0"><img src="assets/images/user/avatar-1.jpg" alt="user" class="user-avtar wid-45 rounded-circle" /></div>
-            <div class="flex-grow-1 ms-3 me-2"><h6 class="mb-0">Petani Admin</h6><small>Administrator</small></div>
+            <div class="flex-grow-1 ms-3 me-2"><h6 class="mb-0">Sistem Akun</h6><small>Petani Terdaftar</small></div>
           </div>
         </div>
       </div>
@@ -51,6 +51,28 @@
         <li class="pc-h-item pc-sidebar-collapse"><a href="#" class="pc-head-link ms-0" id="sidebar-hide"><i class="ti ti-menu-2"></i></a></li>
       </ul>
     </div>
+    <div class="ms-auto">
+      <ul class="list-unstyled">
+        <!-- Profile Dropdown & Logout -->
+        <li class="dropdown pc-h-item header-user-profile">
+          <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
+            <img src="assets/images/user/avatar-1.jpg" alt="user-image" class="user-avtar" />
+          </a>
+          <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
+            <div class="dropdown-header d-flex align-items-center justify-content-between">
+              <h5 class="m-0">Profil Pengguna</h5>
+            </div>
+            <div class="dropdown-body">
+              <div class="d-grid mb-3 mt-3">
+                <button class="btn btn-danger" onclick="logout()">
+                  <i class="ti ti-logout me-2"></i>Keluar
+                </button>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
   </div>
 </header>
 
@@ -69,7 +91,7 @@
       <div class="col-md-4 col-sm-6">
         <div class="card statistics-card-1">
           <div class="card-body">
-            <img src="assets/images/widget/img-status-2.svg" alt="img" class="img-fluid img-bg" />
+            <img src="assets/images/widget/img-status-2.svg" alt="img" class="img-fluid img-bg" onerror="this.style.display='none'"/>
             <div class="d-flex align-items-center">
               <div class="avtar bg-brand-color-1 text-white me-3"><i class="ti ti-plant-2 f-24"></i></div>
               <div>
@@ -87,7 +109,7 @@
       <div class="col-md-4 col-sm-6">
         <div class="card statistics-card-1">
           <div class="card-body">
-            <img src="assets/images/widget/img-status-1.svg" alt="img" class="img-fluid img-bg" />
+            <img src="assets/images/widget/img-status-1.svg" alt="img" class="img-fluid img-bg" onerror="this.style.display='none'"/>
             <div class="d-flex align-items-center">
               <div class="avtar bg-brand-color-2 text-white me-3"><i class="ti ti-droplet f-24"></i></div>
               <div>
@@ -105,7 +127,7 @@
       <div class="col-md-4 col-sm-12">
         <div class="card statistics-card-1">
           <div class="card-body">
-            <img src="assets/images/widget/img-status-3.svg" alt="img" class="img-fluid img-bg" />
+            <img src="assets/images/widget/img-status-3.svg" alt="img" class="img-fluid img-bg" onerror="this.style.display='none'"/>
             <div class="d-flex align-items-center">
               <div class="avtar bg-brand-color-3 text-white me-3"><i class="ti ti-robot f-24"></i></div>
               <div>
@@ -131,13 +153,15 @@
               <table class="table table-hover mb-0">
                 <thead>
                   <tr>
+                    <!-- PERBAIKAN: Menambahkan kolom No dan menyesuaikan jumlah kolom HTML -->
+                    <th width="5%">No</th>
                     <th>Nama Lahan</th>
                     <th>Jenis Tugas</th>
-                    <th>Status</th>
+                    <th width="20%">Status / Aksi</th>
                   </tr>
                 </thead>
                 <tbody id="tabelTugasHariIni">
-                  <tr><td colspan="3" class="text-center text-muted">Memuat data tugas...</td></tr>
+                  <tr><td colspan="4" class="text-center text-muted">Memuat data tugas...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -161,44 +185,112 @@
 <script>change_box_container('false'); layout_caption_change('true'); layout_rtl_change('false'); preset_change("preset-1");</script>
 
 <script>
-  const apiBaseUrl = 'http://127.0.0.1:8000/api';
+    const apiBaseUrl = 'http://127.0.0.1:8000/api';
 
-  document.addEventListener("DOMContentLoaded", function() {
-      // 1. Ambil Total Lahan
-      fetch(`${apiBaseUrl}/lahan`)
-          .then(res => res.json())
-          .then(data => {
-              // Hitung lahan yang statusnya belum selesai (aktif)
-              const lahanAktif = data.filter(l => l.status_selesai === false).length;
-              document.getElementById('angkaLahan').innerText = lahanAktif;
-          })
-          .catch(err => console.error(err));
+    // FUNGSI KELUAR (LOGOUT)
+    function logout() {
+        localStorage.removeItem('agridss_token');
+        window.location.href = 'login.html';
+    }
 
-      // 2. Ambil Tugas Hari Ini
-      fetch(`${apiBaseUrl}/jadwal/hari-ini`)
-          .then(res => res.json())
-          .then(data => {
-              document.getElementById('angkaTugas').innerText = data.length;
-              
-              const tbody = document.getElementById('tabelTugasHariIni');
-              tbody.innerHTML = '';
-              
-              if(data.length === 0) {
-                  tbody.innerHTML = '<tr><td colspan="3" class="text-center">Tidak ada tugas hari ini. Lahan aman!</td></tr>';
-              } else {
-                  data.forEach(tugas => {
-                      tbody.innerHTML += `
-                          <tr>
-                              <td><strong>${tugas.lahan}</strong></td>
-                              <td><i class="ti ti-droplet text-primary me-1"></i> ${tugas.tugas}</td>
-                              <td><span class="badge bg-warning">Menunggu</span></td>
-                          </tr>
-                      `;
-                  });
-              }
-          })
-          .catch(err => console.error(err));
-  });
+    document.addEventListener("DOMContentLoaded", function() {
+        const token = localStorage.getItem('agridss_token');
+        
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        const headers = { 'Authorization': 'Bearer ' + token };
+
+        // 1. Ambil Data Lahan untuk Angka Ringkasan
+        fetch(`${apiBaseUrl}/lahan`, { headers })
+            .then(res => {
+                if (res.status === 401) logout();
+                return res.json();
+            })
+            .then(data => {
+                const elTotal = document.getElementById('angkaLahan');
+                if (elTotal) elTotal.innerText = data.length;
+            })
+            .catch(err => console.error("Gagal muat lahan:", err));
+
+        // 2. Ambil Jadwal Hari Ini & Cetak ke Tabel
+        fetch(`${apiBaseUrl}/jadwal/hari-ini`, { headers })
+            .then(res => res.json())
+            .then(data => {
+                const elJadwal = document.getElementById('angkaTugas');
+                if (elJadwal) elJadwal.innerText = data.length;
+
+                const wadahTugas = document.getElementById('tabelTugasHariIni'); 
+                
+                if (wadahTugas) {
+                    wadahTugas.innerHTML = ''; 
+                    
+                    if (data.length === 0) {
+                        wadahTugas.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Aman! Tidak ada tugas perawatan hari ini.</td></tr>';
+                        return;
+                    }
+
+                    data.forEach((item, index) => {
+                        // LOGIKA TOMBOL: Jika sudah selesai tampilkan lencana hijau, jika belum tampilkan tombol
+                        let aksiAtauStatus = '';
+                        if (item.status === 'Selesai') {
+                            aksiAtauStatus = `<span class="badge bg-success py-2 px-3"><i class="ti ti-check me-1"></i> Selesai</span>`;
+                        } else {
+                            aksiAtauStatus = `<button class="btn btn-sm btn-outline-success" onclick="tandaiSelesai(${item.id}, this)"><i class="ti ti-check me-1"></i> Tandai Selesai</button>`;
+                        }
+
+                        wadahTugas.innerHTML += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td><strong>${item.lahan}</strong></td>
+                                <td><span class="badge bg-primary bg-opacity-10 text-primary py-2 px-3">${item.tugas}</span></td>
+                                <td>${aksiAtauStatus}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            })
+            .catch(err => {
+                console.error("Gagal muat jadwal:", err);
+                const wadahTugas = document.getElementById('tabelTugasHariIni');
+                if (wadahTugas) wadahTugas.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Gagal terhubung ke peladen.</td></tr>';
+            });
+    });
+
+    // 3. FUNGSI UNTUK MENEKAN TOMBOL SELESAI
+    window.tandaiSelesai = function(jadwalId, tombolElement) {
+        const token = localStorage.getItem('agridss_token');
+        if (!token) return;
+
+        // Ubah tombol jadi loading
+        tombolElement.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Proses...';
+        tombolElement.disabled = true;
+
+        fetch(`${apiBaseUrl}/jadwal/${jadwalId}/selesai`, {
+            method: 'PUT',
+            headers: { 
+                'Authorization': 'Bearer ' + token 
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Gagal update status');
+            return response.json();
+        })
+        .then(data => {
+            // Jika sukses, ganti tombol menjadi lencana (badge) "Selesai" warna hijau
+            const parentTd = tombolElement.parentElement;
+            parentTd.innerHTML = `<span class="badge bg-success py-2 px-3"><i class="ti ti-check me-1"></i> Selesai</span>`;
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Terjadi kesalahan saat mengupdate tugas!");
+            // Kembalikan tombol jika gagal
+            tombolElement.innerHTML = '<i class="ti ti-check me-1"></i> Tandai Selesai';
+            tombolElement.disabled = false;
+        });
+    };
 </script>
 </body>
 </html>
