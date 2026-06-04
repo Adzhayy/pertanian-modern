@@ -99,5 +99,11 @@ def selesaikan_tugas(jadwal_id: int, db: Session = Depends(get_db), current_user
 
     jadwal.status_selesai = "Selesai"
     db.commit()
+
+    kirim_pesan_telegram(
+        f"✅ *Tugas Selesai!*\n\n"
+        f"Lahan: *{lahan.nama_lahan}*\n"
+        f"Tugas: *{jadwal.jenis_tugas}* telah selesai dikerjakan. Kerja bagus! 👨‍🌾"
+    )
     
     return {"pesan": "Tugas berhasil ditandai selesai!"}
