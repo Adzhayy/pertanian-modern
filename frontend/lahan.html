@@ -249,7 +249,7 @@
 
 <!-- SCRIPT UNTUK KOMUNIKASI API (FETCH) -->
 <script>
-    const apiBaseUrl = 'http://127.0.0.1:8000/api';
+    const apiBaseUrl = 'https://pertanian-modern-production.up.railway.app/api';
 
     // FUNGSI KELUAR (LOGOUT)
     function logout() {
@@ -359,7 +359,7 @@
         };
 
         // Kirim permintaan POST
-        fetch('http://127.0.0.1:8000/api/lahan', {
+        fetch(`${apiBaseUrl}/lahan`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
