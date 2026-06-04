@@ -169,12 +169,13 @@
                     <th>Tanaman</th>
                     <th>Tanggal Tanam</th>
                     <th>Estimasi Panen</th>
+                    <th>Aksi</th>
                   </tr>
                 </thead>
                 <!-- ID SUDAH DISAMAKAN: dataLahanContainer -->
                 <tbody id="dataLahanContainer">
                     <tr>
-                        <td colspan="5" class="text-center text-muted">Sedang memuat data lahan...</td>
+                        <td colspan="6" class="text-center text-muted">Sedang memuat data lahan...</td>
                     </tr>
                 </tbody>
               </table>
@@ -248,7 +249,7 @@
 
 <!-- SCRIPT UNTUK KOMUNIKASI API (FETCH) -->
 <script>
-    const apiBaseUrl = 'https://pertanian-modern-production.up.railway.app/api';
+    const apiBaseUrl = 'http://127.0.0.1:8000/api';
 
     // FUNGSI KELUAR (LOGOUT)
     function logout() {
@@ -304,7 +305,7 @@
             if (tbody) {
                 tbody.innerHTML = '';
                 if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center">Belum ada lahan yang didaftarkan.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center">Belum ada lahan yang didaftarkan.</td></tr>';
                     return;
                 }
                 data.forEach((item, index) => {
@@ -315,6 +316,11 @@
                             <td>${item.nama_tanaman}</td>
                             <td>${item.tanggal_tanam}</td>
                             <td><span class="badge bg-success">${item.estimasi_panen}</span></td>
+                            <td>
+                                <button onclick="hapusLahan(${item.id}, '${item.nama_lahan}')" class="btn btn-danger btn-sm">
+                                    <i class="ti ti-trash"></i> Hapus
+                                </button>
+                            </td>
                         </tr>
                     `;
                 });
@@ -323,7 +329,7 @@
         .catch(err => {
             console.error(err);
             const tbody = document.getElementById('dataLahanContainer'); 
-            if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Gagal memuat data. Server mungkin mati.</td></tr>';
+            if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Gagal memuat data. Server mungkin mati.</td></tr>';
         });
     }
 
@@ -353,7 +359,7 @@
         };
 
         // Kirim permintaan POST
-        fetch('https://pertanian-modern-production.up.railway.app/api/lahan', {
+        fetch('http://127.0.0.1:8000/api/lahan', {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
@@ -395,6 +401,49 @@
             btn.disabled = false;
         });
     });
+
+    // 5. Fungsi untuk menghapus lahan dengan konfirmasi ketat
+    window.hapusLahan = function(idLahan, namaLahan) {
+        // 1. Munculkan peringatan bawaan browser (Alert Konfirmasi)
+        const konfirmasi = confirm(`⚠️ PERINGATAN!\n\nApakah Anda benar-benar yakin ingin menghapus lahan "${namaLahan}"?\n\nSemua jadwal penyiraman & pemupukan untuk lahan ini juga akan ikut musnah selamanya dan tidak bisa dikembalikan.`);
+
+        // 2. Jika pengguna menekan tombol "Cancel/Batal", hentikan proses
+        if (!konfirmasi) {
+            return; 
+        }
+
+        // 3. Jika "OK", ambil token KTP dan eksekusi penghapusan
+        const token = localStorage.getItem('agridss_token');
+
+        fetch(`${apiBaseUrl}/lahan/${idLahan}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(async response => {
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.detail || "Gagal menghapus lahan");
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Tampilkan Alert Sukses di bagian atas tabel
+            const alertBox = document.getElementById('pesanAlert');
+            alertBox.className = 'alert alert-success d-block';
+            alertBox.innerHTML = '<i class="ti ti-check me-2"></i>' + data.pesan;
+            
+            // Sembunyikan alert setelah 3 detik
+            setTimeout(() => { alertBox.classList.replace('d-block', 'd-none'); }, 3000);
+            
+            // Segarkan Tabel secara dinamis (tanpa perlu reload halaman)
+            muatDataLahan(); 
+        })
+        .catch(error => {
+            alert("❌ Error: " + error.message);
+        });
+    };
 </script>
 
 </body>
