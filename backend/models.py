@@ -8,7 +8,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(50), unique=True, index=True)
     password_hash = Column(String(255))
-    telegram_chat_id = Column(String(50), nullable=True) # Untuk notif bot Telegram
+    telegram_chat_id = Column(String(50), nullable=True)
     
     # Relasi: 1 User bisa punya banyak lahan aktif
     lahan = relationship("LahanAktif", back_populates="pemilik")

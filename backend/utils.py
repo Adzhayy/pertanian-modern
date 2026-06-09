@@ -7,23 +7,18 @@ load_dotenv()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-def kirim_pesan_telegram(pesan: str):
-    """Fungsi ajaib untuk mengirim teks ke Telegram"""
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-        print("Peringatan: Token Telegram tidak disetel.")
-        return False
+def kirim_pesan_telegram(pesan: str, chat_id: str = None):
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
     
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    data = urllib.parse.urlencode({
-        "chat_id": TELEGRAM_CHAT_ID, 
-        "text": pesan, 
-        "parse_mode": "Markdown"
-    }).encode("utf-8")
-    
-    try:
-        req = urllib.request.Request(url, data=data)
-        with urllib.request.urlopen(req) as response:
+    if not chat_id:
+        chat_id = os.getenv("TELEGRAM_CHAT_ID")
+        
+    if token and chat_id:
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        try:
+            requests.post(url, json={"chat_id": chat_id, "text": pesan})
             return True
-    except Exception as e:
-        print(f"Gagal mengirim ke Telegram: {e}")
-        return False
+        except Exception as e:
+            print("Gagal mengirim Telegram:", e)
+            return False
+    return False

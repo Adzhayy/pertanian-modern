@@ -27,3 +27,29 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     # Berikan token JWT (KTP Digital)
     token = auth.create_access_token(data={"sub": user.username})
     return {"access_token": token, "token_type": "bearer"}
+
+@router.get("/api/user/me")
+def get_user_profile(current_user: models.User = Depends(get_current_user)):
+    """Mengambil data pengguna yang sedang login untuk mengecek status Telegram"""
+    return {
+        "username": current_user.username,
+        "telegram_chat_id": current_user.telegram_chat_id
+    }
+
+@router.put("/api/user/telegram")
+def update_telegram_id(data: schemas.TelegramUpdate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    """Menyimpan ID Telegram yang baru diinput oleh pengguna"""
+    user = db.query(models.User).filter(models.User.id == current_user.id).first()
+    user.telegram_chat_id = data.telegram_chat_id
+    db.commit()
+    return {"pesan": "Notifikasi Telegram berhasil dihubungkan!"}
+
+@router.get("/api/patch-db")
+def patch_database(db: Session = Depends(get_db)):
+    """Jalur rahasia untuk memperbarui tabel database di Railway secara otomatis"""
+    try:
+        db.execute(text("ALTER TABLE users ADD COLUMN telegram_chat_id VARCHAR(50) DEFAULT NULL;"))
+        db.commit()
+        return {"pesan": "Sukses! Kolom telegram_chat_id berhasil ditambahkan ke database MySQL Anda."}
+    except Exception as e:
+        return {"pesan": f"Database sudah diperbarui atau terjadi kesalahan: {str(e)}"}
