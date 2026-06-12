@@ -144,11 +144,13 @@
     <div class="row mt-3">
       <div class="col-md-12">
         <div class="card">
-          <div class="card-header">
-            <h5>Daftar Perawatan (Hari Ini)</h5>
+          <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+            <h5 class="mb-0">Daftar Perawatan (Hari Ini)</h5>
+            <button class="btn btn-warning btn-sm mt-2 mt-sm-0" onclick="kirimPengingatPagi()" id="btnBroadcast">
+              <i class="ti ti-bell-ringing"></i> Kirim Pengingat Pagi
+            </button>
           </div>
           <div class="card-body p-0">
-            <!-- TAMBAHAN: Tempat memunculkan notifikasi sukses Telegram -->
             <div id="pesanAlertDashboard" class="alert d-none mx-4 mt-3" role="alert"></div>
 
             <div class="table-responsive">
@@ -359,7 +361,38 @@
         });
     };
 
-    // 5. FUNGSI UNTUK MENYIMPAN CHAT ID DARI MODAL
+    // 5. FUNGSI MENGIRIM BROADCAST PENGINGAT PAGI
+    window.kirimPengingatPagi = function() {
+        const btn = document.getElementById('btnBroadcast');
+        const token = localStorage.getItem('agridss_token');
+        
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Mengirim...';
+        btn.disabled = true;
+
+        fetch(`${apiBaseUrl}/telegram/broadcast`, {
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const alertBox = document.getElementById('pesanAlertDashboard');
+            if (alertBox) {
+                alertBox.className = 'alert alert-info d-block mx-4 mt-3 shadow-sm';
+                alertBox.innerHTML = `<i class="ti ti-speakerphone me-2 fs-5 align-middle"></i> <strong>Sistem Broadcast:</strong> ${data.pesan}`;
+                setTimeout(() => { alertBox.classList.replace('d-block', 'd-none'); }, 6000);
+            }
+        })
+        .catch(err => {
+            alert("❌ Terjadi kesalahan saat mengirim broadcast!");
+            console.error(err);
+        })
+        .finally(() => {
+            btn.innerHTML = '<i class="ti ti-bell-ringing"></i> Kirim Pengingat Pagi';
+            btn.disabled = false;
+        });
+    };
+
+    // 6. FUNGSI UNTUK MENYIMPAN CHAT ID DARI MODAL
     window.simpanTelegramId = function() {
         const chatIdInput = document.getElementById('inputChatId').value.trim();
         const btn = document.getElementById('btnSimpanTelegram');
