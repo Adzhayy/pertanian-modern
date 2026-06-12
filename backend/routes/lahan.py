@@ -109,19 +109,10 @@ def broadcast_pengingat_harian(db: Session = Depends(get_db)):
 
     return {"pesan": f"Berhasil mengirim pengingat pagi ke {jumlah_terkirim} petani!"}
 
-@router.get("/api/telegram/test")
-def test_telegram_hari_ini(db: Session = Depends(get_db)):
-    hari_ini = date.today()
-    jadwal = db.query(models.JadwalPerawatan).filter(models.JadwalPerawatan.tanggal_tugas == hari_ini).all()
-    pesan = f"🌱 *Laporan AgriDSS Hari Ini* 🌱\n📅 {hari_ini.strftime('%d-%m-%Y')}\n\n"
-    if not jadwal:
-        pesan += "Lahan aman! ✨"
-    else:
-        for j in jadwal:
-            pesan += f"✅ *{db.query(models.LahanAktif).filter(models.LahanAktif.id == j.lahan_id).first().nama_lahan}* - {j.jenis_tugas}\n"
-    sukses = kirim_pesan_telegram(pesan)
-    if sukses: return {"pesan": "Notifikasi dikirim!"}
-    raise HTTPException(status_code=500, detail="Gagal kirim")
+@router.get("/api/jadwal/hari-ini")
+def get_jadwal_hari_ini(db: Session = Depends(get_db)):
+    jadwal = db.query(models.JadwalPerawatan).filter(models.JadwalPerawatan.tanggal_tugas == date.today()).all()
+    return [{"id": j.id, "tugas": j.jenis_tugas, "lahan": db.query(models.LahanAktif).filter(models.LahanAktif.id == j.lahan_id).first().nama_lahan, "status": j.status_selesai} for j in jadwal]
 
 @router.put("/api/jadwal/{jadwal_id}/selesai")
 def selesaikan_tugas(jadwal_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
