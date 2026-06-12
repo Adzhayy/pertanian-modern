@@ -35,7 +35,7 @@ def tambah_lahan(lahan: schemas.LahanCreate, db: Session = Depends(get_db), curr
     db.add_all(jadwal_list)
     db.commit()
 
-    kirim_pesan_telegram(f"🎉 *Lahan Baru Terdaftar!*\n\nLahan: *{lahan_baru.nama_lahan}*\nKomoditas: *{tanaman.nama_tanaman}*\n\nSistem menjadwalkan {len(jadwal_list)} tugas harian.")
+    kirim_pesan_telegram(f"🎉 *Lahan Baru Terdaftar!*\n\nLahan: *{lahan_baru.nama_lahan}*\nKomoditas: *{tanaman.nama_tanaman}*\n\nSistem menjadwalkan {len(jadwal_list)} tugas harian.",current_user.telegram_chat_id)
     return {"pesan": "Berhasil!", "data": lahan_baru}
 
 @router.get("/api/lahan")
@@ -64,7 +64,7 @@ def hapus_lahan(lahan_id: int, db: Session = Depends(get_db), current_user: mode
     db.commit()
     
     # Opsional: Kirim notif ke Telegram kalau ada yang dihapus
-    kirim_pesan_telegram(f"🗑️ *Lahan Dihapus*\nLahan *{lahan.nama_lahan}* beserta seluruh jadwalnya telah dihapus oleh pengguna.")
+    kirim_pesan_telegram(f"🗑️ *Lahan Dihapus*\nLahan *{lahan.nama_lahan}* beserta seluruh jadwalnya telah dihapus oleh pengguna.",current_user.telegram_chat_id)
     
     return {"pesan": "Lahan berhasil dihapus selamanya!"}
 
@@ -103,7 +103,8 @@ def selesaikan_tugas(jadwal_id: int, db: Session = Depends(get_db), current_user
     kirim_pesan_telegram(
         f"✅ *Tugas Selesai!*\n\n"
         f"Lahan: *{lahan.nama_lahan}*\n"
-        f"Tugas: *{jadwal.jenis_tugas}* telah selesai dikerjakan. Kerja bagus! 👨‍🌾"
+        f"Tugas: *{jadwal.jenis_tugas}* telah selesai dikerjakan. Kerja bagus! 👨‍🌾",
+        current_user.telegram_chat_id
     )
     
     return {"pesan": "Tugas berhasil ditandai selesai!"}
