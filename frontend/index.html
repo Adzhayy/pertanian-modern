@@ -132,15 +132,14 @@
               <div class="avtar bg-brand-color-3 text-white me-3"><i class="ti ti-robot f-24"></i></div>
               <div>
                 <p class="text-muted mb-0">Bot Telegram</p>
-                <div class="d-flex align-items-end">
-                  <h3 class="mb-0 f-w-500 text-success">Terkoneksi</h3>
+                <div class="d-flex align-items-end mt-1" id="wadahStatusTelegram">
+                  <span class="spinner-border spinner-border-sm text-primary"></span>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
     <div class="row mt-3">
       <div class="col-md-12">
@@ -175,6 +174,36 @@
   </div>
 </div>
 
+<div class="modal fade" id="telegramModal" tabindex="-1" aria-labelledby="telegramModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="telegramModalLabel"><i class="ti ti-brand-telegram text-primary me-2"></i>Hubungkan Notifikasi</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info bg-light-info border-0">
+          <h6 class="alert-heading fw-bold mb-2">Langkah-langkah:</h6>
+          <ol class="mb-0 ps-3 small">
+            <li>Buka Telegram dan cari bot <strong>@agridss_taufiq_bot</strong> <em>Asisten Tani AgriDSS</em>.</li>
+            <li>Tekan tombol <strong>Start</strong> di dalam obrolan bot tersebut.</li>
+            <li>Teruskan pesan sembarang dari akunmu ke bot <strong>@userinfobot</strong> untuk mendapatkan angka Chat ID Anda.</li>
+            <li>Masukkan angka Chat ID tersebut ke kolom di bawah ini.</li>
+          </ol>
+        </div>
+        <div class="mb-3">
+          <label for="inputChatId" class="form-label fw-bold text-muted small">Telegram Chat ID Anda</label>
+          <input type="text" class="form-control" id="inputChatId" placeholder="Contoh: 8146044956">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-primary" id="btnSimpanTelegram" onclick="simpanTelegramId()">Simpan & Hubungkan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer class="pc-footer"><div class="footer-wrapper container-fluid"><div class="row"><div class="col my-1"><p class="m-0 text-muted">Sistem Pendukung Keputusan Pertanian © 2026</p></div></div></div></footer> 
 
 <script src="assets/js/plugins/popper.min.js"></script>
@@ -193,6 +222,32 @@
     function logout() {
         localStorage.removeItem('agridss_token');
         window.location.href = 'login.html';
+    }
+
+    // FUNGSI CEK STATUS TELEGRAM PENGGUNA BARU
+    function cekStatusTelegram() {
+        const token = localStorage.getItem('agridss_token');
+        fetch(`${apiBaseUrl}/user/me`, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const wadah = document.getElementById('wadahStatusTelegram');
+            if (!wadah) return;
+
+            // Jika telegram_chat_id sudah terisi di database
+            if (data.telegram_chat_id) {
+                wadah.innerHTML = `<h4 class="mb-0 f-w-600 text-success"><i class="ti ti-check me-1"></i>Terkoneksi</h4>`;
+            } else {
+                // Jika belum, tampilkan tombol merah yang membuka pop-up Modal
+                wadah.innerHTML = `
+                    <button class="btn btn-sm btn-danger d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#telegramModal">
+                        <i class="ti ti-link me-1"></i> Hubungkan ke Tele
+                    </button>
+                `;
+            }
+        })
+        .catch(err => console.error("Gagal cek profil:", err));
     }
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -258,9 +313,12 @@
                 const wadahTugas = document.getElementById('tabelTugasHariIni');
                 if (wadahTugas) wadahTugas.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Gagal terhubung ke peladen.</td></tr>';
             });
+
+        // 3. Panggil pengecekan status telegram
+        cekStatusTelegram();
     });
 
-    // 3. FUNGSI UNTUK MENEKAN TOMBOL SELESAI
+    // 4. FUNGSI UNTUK MENEKAN TOMBOL SELESAI
     window.tandaiSelesai = function(jadwalId, tombolElement) {
         const token = localStorage.getItem('agridss_token');
         if (!token) return;
@@ -290,18 +348,62 @@
                 alertBox.className = 'alert alert-success d-block mx-4 mt-3 shadow-sm';
                 alertBox.innerHTML = `<i class="ti ti-bell-ringing me-2 fs-5 align-middle"></i> <strong>Cek Telegram!</strong> ${data.pesan}`;
                 
-                // Hilangkan notifikasi secara otomatis setelah 5 detik
-                setTimeout(() => { 
-                    alertBox.classList.replace('d-block', 'd-none'); 
-                }, 5000);
+                setTimeout(() => { alertBox.classList.replace('d-block', 'd-none'); }, 5000);
             }
         })
         .catch(err => {
             console.error(err);
             alert("Terjadi kesalahan saat mengupdate tugas!");
-            // Kembalikan tombol jika gagal
             tombolElement.innerHTML = '<i class="ti ti-check me-1"></i> Tandai Selesai';
             tombolElement.disabled = false;
+        });
+    };
+
+    // 5. FUNGSI UNTUK MENYIMPAN CHAT ID DARI MODAL
+    window.simpanTelegramId = function() {
+        const chatIdInput = document.getElementById('inputChatId').value.trim();
+        const btn = document.getElementById('btnSimpanTelegram');
+        const token = localStorage.getItem('agridss_token');
+
+        if (!chatIdInput) {
+            alert('Harap masukkan Chat ID terlebih dahulu!');
+            return;
+        }
+
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...';
+        btn.disabled = true;
+
+        fetch(`${apiBaseUrl}/user/telegram`, {
+            method: 'PUT',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token 
+            },
+            body: JSON.stringify({ telegram_chat_id: chatIdInput })
+        })
+        .then(async response => {
+            if (!response.ok) throw new Error('Gagal menyimpan ID');
+            return response.json();
+        })
+        .then(data => {
+            // Tutup modal
+            const modalEl = document.getElementById('telegramModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            modalInstance.hide();
+            
+            // Ubah tombol merah menjadi Terkoneksi hijau
+            cekStatusTelegram();
+            
+            // Tampilkan notifikasi sukses
+            alert("✅ " + data.pesan);
+        })
+        .catch(err => {
+            alert("❌ Terjadi kesalahan saat menyimpan! Pastikan format benar.");
+            console.error(err);
+        })
+        .finally(() => {
+            btn.innerHTML = 'Simpan & Hubungkan';
+            btn.disabled = false;
         });
     };
 </script>
