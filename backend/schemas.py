@@ -6,6 +6,7 @@ class LahanCreate(BaseModel):
     tanaman_id: int
     tanggal_tanam: date
     user_id: int = 1
+    kota: str
 
 class AnalisisTanahInput(BaseModel):
     lahan_id: int

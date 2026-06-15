@@ -29,3 +29,24 @@ def kirim_pesan_telegram(pesan: str, chat_id: str = None):
         print("TELEGRAM ERROR: Token atau Chat ID kosong!")
         
     return False
+
+def cek_hujan(kota: str = "Kudus"):
+    """Mengambil PRAKIRAAN cuaca 12 jam ke depan dari OpenWeatherMap"""
+    api_key = os.getenv("OPENWEATHER_API_KEY")
+    if not api_key: return False
+
+    # Menggunakan endpoint 'forecast' bukan 'weather'
+    url = f"http://api.openweathermap.org/data/2.5/forecast?q={kota}&appid={api_key}&units=metric"
+    try:
+        res = requests.get(url)
+        if res.status_code == 200:
+            data = res.json()
+            # Mengecek cuaca untuk 4 interval ke depan (sekitar 12 jam ke depan dari saat ini)
+            for forecast in data['list'][:4]:
+                cuaca = forecast['weather'][0]['main'].lower()
+                if cuaca in ["rain", "drizzle", "thunderstorm"]:
+                    return True # Jika terdeteksi hujan, langsung laporkan True!
+    except Exception as e:
+        print(f"Gagal mengecek cuaca untuk {kota}: {e}")
+        
+    return False

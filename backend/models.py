@@ -47,3 +47,10 @@ class JadwalPerawatan(Base):
     status_selesai = Column(String(50), default="Menunggu") # Menunggu, Selesai, Ditunda Cuaca
     
     lahan = relationship("LahanAktif", back_populates="jadwal")
+
+class LahanAktif(Base):
+    __tablename__ = "lahan_aktif"
+    # ... (kolom lain biarkan) ...
+    tanggal_tanam = Column(Date)
+    status_selesai = Column(Boolean, default=False)
+    kota = Column(String(100), default="Kudus") # <--- TAMBAHAN BARU

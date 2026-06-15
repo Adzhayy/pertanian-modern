@@ -17,7 +17,7 @@ def tambah_lahan(lahan: schemas.LahanCreate, db: Session = Depends(get_db), curr
     tanaman = db.query(models.MasterTanaman).filter(models.MasterTanaman.id == lahan.tanaman_id).first()
     if not tanaman:
         raise HTTPException(status_code=404, detail="ID Tanaman tidak ditemukan di database")
-    lahan_baru = models.LahanAktif(nama_lahan=lahan.nama_lahan, user_id=current_user.id, tanaman_id=lahan.tanaman_id, tanggal_tanam=lahan.tanggal_tanam, status_selesai=False)
+    lahan_baru = models.LahanAktif(nama_lahan=lahan.nama_lahan, user_id=current_user.id, tanaman_id=lahan.tanaman_id, tanggal_tanam=lahan.tanggal_tanam, kota=lahan.kota, status_selesai=False)
     db.add(lahan_baru)
     db.commit()
     db.refresh(lahan_baru)
@@ -68,9 +68,7 @@ def hapus_lahan(lahan_id: int, db: Session = Depends(get_db), current_user: mode
     
     return {"pesan": "Lahan berhasil dihapus selamanya!"}
 
-# --- 1. MESIN BROADCAST INTI (Berjalan di latar belakang) ---
 def proses_broadcast_otomatis():
-    # Buka koneksi database sendiri tanpa bantuan API
     db = SessionLocal()
     try:
         hari_ini = date.today()
@@ -91,22 +89,42 @@ def proses_broadcast_otomatis():
             if not user or not user.telegram_chat_id: continue 
             
             if user.id not in tugas_per_user:
-                tugas_per_user[user.id] = {"chat_id": user.telegram_chat_id, "tugas": []}
-            tugas_per_user[user.id]["tugas"].append(f"🌱 *{lahan.nama_lahan}* - {jadwal.jenis_tugas}")
+                tugas_per_user[user.id] = {"chat_id": user.telegram_chat_id, "tugas": [], "ada_hujan": False}
+            
+            # --- LOGIKA KECERDASAN BUATAN ---
+            # 1. Cek cuaca sesuai dengan kota lahan masing-masing
+            sedang_hujan = cek_hujan(lahan.kota)
+            if sedang_hujan: tugas_per_user[user.id]["ada_hujan"] = True
+            
+            teks_tugas = jadwal.jenis_tugas
+            
+            # 2. Jika hari ini diprediksi hujan dan tugasnya adalah menyiram
+            if sedang_hujan and "Penyiraman" in teks_tugas:
+                teks_tugas = "~~Penyiraman~~ 🌧️ *(Selesai Otomatis: Alam akan menyiramnya hari ini!)*"
+                # Langsung tandai selesai di Database agar tidak menumpuk!
+                jadwal.status_selesai = "Selesai (Hujan)"
+                db.commit()
+                
+            tugas_per_user[user.id]["tugas"].append(f"🌱 *{lahan.nama_lahan}* ({lahan.kota}) - {teks_tugas}")
 
         jumlah_terkirim = 0
         for user_id, data in tugas_per_user.items():
-            pesan = f"🌅 *Selamat Pagi, Petani!* 🌅\n📅 {hari_ini.strftime('%d-%m-%Y')}\n\nBerikut adalah tugas perawatan lahan Anda hari ini yang menunggu diselesaikan:\n\n"
-            for t in data["tugas"]:
-                pesan += f"• {t}\n"
-            pesan += "\nSemangat bertani hari ini! Jangan lupa 'Tandai Selesai' di Dashboard ya! 🚜"
+            pesan = f"🌅 *Selamat Pagi, Petani!* 🌅\n📅 {hari_ini.strftime('%d-%m-%Y')}\n\n"
+            
+            if data["ada_hujan"]:
+                pesan += "☁️ *Prakiraan Cuaca:* Akan turun hujan di beberapa wilayah lahan Anda!\n\n"
+            else:
+                pesan += "☀️ *Prakiraan Cuaca:* Cerah/Berawan.\n\n"
+                
+            pesan += "Berikut adalah tugas perawatan hari ini:\n"
+            for t in data["tugas"]: pesan += f"• {t}\n"
+            pesan += "\nSemangat bertani hari ini! 🚜"
             
             sukses = kirim_pesan_telegram(pesan, data["chat_id"])
             if sukses: jumlah_terkirim += 1
 
-        return f"Berhasil mengirim pengingat pagi ke {jumlah_terkirim} petani!"
+        return f"Berhasil mengirim pengingat ke {jumlah_terkirim} petani!"
     finally:
-        # Selalu tutup database setelah selesai agar peladen tidak berat
         db.close()
 
 # --- 2. JALUR API UNTUK TOMBOL MANUAL DI DASHBOARD ---

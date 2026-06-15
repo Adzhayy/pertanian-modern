@@ -213,6 +213,10 @@
             <label for="tanggalTanam" class="form-label">Tanggal Penanaman</label>
             <input type="date" class="form-control" id="tanggalTanam" required>
           </div>
+          <div class="mb-3">
+            <label for="kotaLahan" class="form-label">Lokasi Lahan (Kota/Kabupaten)</label>
+            <input type="text" class="form-control" id="kotaLahan" placeholder="Contoh: Kudus, Demak, Semarang" required>
+          </div>
         </form>
       </div>
       <div class="modal-footer">
@@ -355,7 +359,8 @@
         const dataKirim = {
             nama_lahan: nama,
             tanaman_id: parseInt(tanamanId),
-            tanggal_tanam: tanggal
+            tanggal_tanam: tanggal,
+            kota: document.getElementById('kotaLahan').value
         };
 
         // Kirim permintaan POST

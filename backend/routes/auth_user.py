@@ -55,3 +55,12 @@ def patch_database(db: Session = Depends(get_db)):
         return {"pesan": "Sukses! Kolom telegram_chat_id berhasil ditambahkan ke database MySQL Anda."}
     except Exception as e:
         return {"pesan": f"Database sudah diperbarui atau terjadi kesalahan: {str(e)}"}
+    
+@router.get("/api/patch-db-kota")
+def patch_db_kota(db: Session = Depends(get_db)):
+    try:
+        db.execute(text("ALTER TABLE lahan_aktif ADD COLUMN kota VARCHAR(100) DEFAULT 'Kudus';"))
+        db.commit()
+        return {"pesan": "Kolom kota berhasil ditambahkan ke database!"}
+    except Exception as e:
+        return {"pesan": str(e)}
