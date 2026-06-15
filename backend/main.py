@@ -2,6 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, SessionLocal
 import models
+from apscheduler.schedulers.background import BackgroundScheduler
+import pytz
+from routes.lahan import proses_broadcast_otomatis
 
 
 
@@ -39,6 +42,19 @@ def startup_event():
         ])
         db.commit()
     db.close()
+
+@app.on_event("startup")
+def start_scheduler():
+    scheduler = BackgroundScheduler()
+    # Mengunci zona waktu
+    tz = pytz.timezone('Asia/Jakarta')
+    
+    # Menyetel jadwal eksekusi: Setiap hari jam 06:00
+    scheduler.add_job(proses_broadcast_otomatis, 'cron', hour=6, minute=0, timezone=tz)
+    
+    # Menyalakan mesin alarm
+    scheduler.start()
+    print("⏰ Mesin alarm otomatis berhasil dihidupkan!")
 
 # Memasang (mendaftarkan) rute-rute yang ada di folder routes
 app.include_router(auth_user.router)

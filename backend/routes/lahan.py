@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import date, timedelta
 import models, schemas
-from database import get_db
+from database import get_db, SessionLocal
 from utils import kirim_pesan_telegram
 from auth import get_current_user
 
@@ -68,46 +68,53 @@ def hapus_lahan(lahan_id: int, db: Session = Depends(get_db), current_user: mode
     
     return {"pesan": "Lahan berhasil dihapus selamanya!"}
 
+# --- 1. MESIN BROADCAST INTI (Berjalan di latar belakang) ---
+def proses_broadcast_otomatis():
+    # Buka koneksi database sendiri tanpa bantuan API
+    db = SessionLocal()
+    try:
+        hari_ini = date.today()
+        jadwal_hari_ini = db.query(models.JadwalPerawatan).filter(
+            models.JadwalPerawatan.tanggal_tugas == hari_ini,
+            models.JadwalPerawatan.status_selesai == "Menunggu"
+        ).all()
+
+        if not jadwal_hari_ini:
+            return "Aman! Tidak ada tugas yang menunggu hari ini."
+
+        tugas_per_user = {}
+        for jadwal in jadwal_hari_ini:
+            lahan = db.query(models.LahanAktif).filter(models.LahanAktif.id == jadwal.lahan_id).first()
+            if not lahan: continue
+            
+            user = db.query(models.User).filter(models.User.id == lahan.user_id).first()
+            if not user or not user.telegram_chat_id: continue 
+            
+            if user.id not in tugas_per_user:
+                tugas_per_user[user.id] = {"chat_id": user.telegram_chat_id, "tugas": []}
+            tugas_per_user[user.id]["tugas"].append(f"🌱 *{lahan.nama_lahan}* - {jadwal.jenis_tugas}")
+
+        jumlah_terkirim = 0
+        for user_id, data in tugas_per_user.items():
+            pesan = f"🌅 *Selamat Pagi, Petani!* 🌅\n📅 {hari_ini.strftime('%d-%m-%Y')}\n\nBerikut adalah tugas perawatan lahan Anda hari ini yang menunggu diselesaikan:\n\n"
+            for t in data["tugas"]:
+                pesan += f"• {t}\n"
+            pesan += "\nSemangat bertani hari ini! Jangan lupa 'Tandai Selesai' di Dashboard ya! 🚜"
+            
+            sukses = kirim_pesan_telegram(pesan, data["chat_id"])
+            if sukses: jumlah_terkirim += 1
+
+        return f"Berhasil mengirim pengingat pagi ke {jumlah_terkirim} petani!"
+    finally:
+        # Selalu tutup database setelah selesai agar peladen tidak berat
+        db.close()
+
+# --- 2. JALUR API UNTUK TOMBOL MANUAL DI DASHBOARD ---
 @router.get("/api/telegram/broadcast")
-def broadcast_pengingat_harian(db: Session = Depends(get_db)):
-    hari_ini = date.today()
-    
-    jadwal_hari_ini = db.query(models.JadwalPerawatan).filter(
-        models.JadwalPerawatan.tanggal_tugas == hari_ini,
-        models.JadwalPerawatan.status_selesai == "Menunggu"
-    ).all()
-
-    if not jadwal_hari_ini:
-        return {"pesan": "Aman! Tidak ada tugas yang menunggu hari ini."}
-
-    tugas_per_user = {}
-    
-    for jadwal in jadwal_hari_ini:
-        lahan = db.query(models.LahanAktif).filter(models.LahanAktif.id == jadwal.lahan_id).first()
-        if not lahan: continue
-        
-        user = db.query(models.User).filter(models.User.id == lahan.user_id).first()
-        if not user or not user.telegram_chat_id: continue 
-        
-        if user.id not in tugas_per_user:
-            tugas_per_user[user.id] = {
-                "chat_id": user.telegram_chat_id,
-                "tugas": []
-            }
-        
-        tugas_per_user[user.id]["tugas"].append(f"🌱 *{lahan.nama_lahan}* - {jadwal.jenis_tugas}")
-
-    jumlah_terkirim = 0
-    for user_id, data in tugas_per_user.items():
-        pesan = f"🌅 *Selamat Pagi, Petani!* 🌅\n📅 {hari_ini.strftime('%d-%m-%Y')}\n\nBerikut adalah tugas perawatan lahan Anda hari ini yang menunggu diselesaikan:\n\n"
-        for t in data["tugas"]:
-            pesan += f"• {t}\n"
-        pesan += "\nSemangat bertani hari ini! Jangan lupa 'Tandai Selesai' di Dashboard ya! 🚜"
-        
-        sukses = kirim_pesan_telegram(pesan, data["chat_id"])
-        if sukses: jumlah_terkirim += 1
-
-    return {"pesan": f"Berhasil mengirim pengingat pagi ke {jumlah_terkirim} petani!"}
+def broadcast_pengingat_harian():
+    # Tombol manual akan memanggil mesin inti di atas
+    hasil = proses_broadcast_otomatis()
+    return {"pesan": hasil}
 
 @router.get("/api/jadwal/hari-ini")
 def get_jadwal_hari_ini(db: Session = Depends(get_db)):
